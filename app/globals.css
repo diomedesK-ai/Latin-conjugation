@@ -1,0 +1,251 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Apple-like pill button with strong glow - always black with white text */
+.pill-glow {
+  @apply rounded-full px-8 py-3 text-sm font-medium transition-all duration-300;
+  @apply bg-black text-white;
+  @apply shadow-[0_4px_30px_rgba(0,0,0,0.4)];
+  @apply hover:shadow-[0_6px_40px_rgba(0,0,0,0.6)] hover:scale-[1.02];
+  @apply active:scale-[0.98];
+  @apply border-none outline-none;
+}
+
+.dark .pill-glow {
+  @apply bg-white text-black;
+  @apply shadow-[0_4px_30px_rgba(255,255,255,0.5)];
+  @apply hover:shadow-[0_6px_40px_rgba(255,255,255,0.7)];
+}
+
+/* Apple-like input with strong glow effect */
+.pill-input {
+  @apply rounded-2xl px-4 py-3 text-base transition-all duration-300;
+  @apply bg-background text-foreground;
+  @apply border border-border/30;
+  @apply outline-none;
+  @apply shadow-[0_3px_20px_rgba(0,0,0,0.12)];
+  @apply focus:shadow-[0_6px_35px_rgba(0,0,0,0.25)] focus:border-foreground/20 focus:scale-[1.01];
+  @apply placeholder:text-muted-foreground/50;
+}
+
+.dark .pill-input {
+  @apply shadow-[0_3px_20px_rgba(255,255,255,0.12)];
+  @apply focus:shadow-[0_6px_35px_rgba(255,255,255,0.25)];
+}
+
+/* Minimal icon button with glow - pure black/white */
+.icon-button, .theme-toggle {
+  @apply rounded-full p-2.5 transition-all duration-300;
+  @apply bg-transparent;
+  @apply border border-border/30;
+  @apply shadow-[0_2px_12px_rgba(0,0,0,0.08)];
+  @apply hover:shadow-[0_3px_18px_rgba(0,0,0,0.12)] hover:scale-105;
+  @apply active:scale-95;
+  @apply outline-none;
+}
+
+.dark .icon-button, .dark .theme-toggle {
+  @apply shadow-[0_2px_12px_rgba(255,255,255,0.08)];
+  @apply hover:shadow-[0_3px_18px_rgba(255,255,255,0.12)];
+}
+
+/* Icon stroke colors */
+.icon-stroke {
+  stroke: black;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dark .icon-stroke {
+  stroke: white;
+}
+
+/* Flowy confetti animation - like petals falling */
+@keyframes confetti-float {
+  0% {
+    transform: translateY(-100vh) translateX(0px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(var(--sway-distance, 0px));
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(720deg);
+  }
+}
+
+.animate-confetti-float {
+  animation: confetti-float linear forwards;
+}
+
+.animate-confetti-rotate {
+  animation: confetti-rotate ease-in-out infinite;
+}
+
+/* Apple Hello Animation - SVG Path Drawing */
+.apple-hello-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.apple-hello-path {
+  stroke-dasharray: 4000;
+  stroke-dashoffset: 4000;
+  animation: drawPath 3s ease-in-out forwards;
+}
+
+@keyframes drawPath {
+  0% {
+    stroke-dashoffset: 4000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .apple-hello-svg {
+    width: 90vw;
+  }
+  .apple-hello-path {
+    stroke-width: 22;
+  }
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+  --font-sans: "Geist", "Geist Fallback";
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
