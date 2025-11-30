@@ -38,22 +38,27 @@ export function LeaderboardModal({ history, onClose }: LeaderboardModalProps) {
             return (
               <div
                 key={session.date}
-                className="flex items-center gap-4 rounded-2xl border border-border/50 bg-card/50 px-4 py-3 shadow-sm"
+                className="flex items-center gap-4 rounded-2xl border border-border/50 bg-card/50 px-4 py-3.5 shadow-sm"
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground/10 text-xs font-medium text-foreground">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-foreground/10 text-sm font-semibold text-foreground">
                   {index + 1}
                 </div>
-                <div className="flex-1 space-y-0.5">
+                <div className="flex-1 space-y-1">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-sm font-medium text-foreground">
+                    <span className="text-base font-semibold text-foreground">
                       {session.correct}/{session.total}
                     </span>
-                    <span className="text-xs text-muted-foreground">({percentage}%)</span>
+                    <span className="text-sm text-muted-foreground">({percentage}%)</span>
                   </div>
-                  <div className="text-xs text-muted-foreground">{formattedDate}</div>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <span>{formattedDate}</span>
+                    <span>•</span>
+                    <span>{formatTime(session.timeInSeconds)}</span>
+                  </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-medium text-foreground">{formatTime(session.timeInSeconds)}</div>
+                  <div className="text-lg font-bold text-foreground">{percentage}%</div>
+                  <div className="text-xs text-muted-foreground">Score</div>
                 </div>
               </div>
             )

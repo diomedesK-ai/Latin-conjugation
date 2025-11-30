@@ -2,7 +2,7 @@ import { createOpenAI } from "@ai-sdk/openai"
 import { generateText } from "ai"
 
 const openai = createOpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY,
 })
 
 export async function POST(request: Request) {
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const isCorrect = normalizedUser === normalizedCorrect
 
     const { text } = await generateText({
-      model: openai("gpt-4.1-turbo"),
+      model: openai("gpt-5.1"),
       prompt: `Tu es un professeur de latin qui aide un élève nommé ${studentName} à pratiquer les conjugaisons.
 
 Le verbe est : ${principalParts} (${verb})

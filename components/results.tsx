@@ -205,25 +205,33 @@ export function Results({ studentName, results, timeInSeconds, history, onRestar
       <div className="space-y-3">
         <p className="text-sm font-medium text-foreground">Révision détaillée</p>
         {results.map((result, index) => (
-          <div
-            key={index}
-            className={`rounded-2xl border p-4 ${
-              result.isCorrect
-                ? "border-green-200/50 bg-green-50/50 dark:border-green-900/30 dark:bg-green-950/20"
-                : "border-red-200/50 bg-red-50/50 dark:border-red-900/30 dark:bg-red-950/20"
-            }`}
-          >
-            <div className="mb-2 flex items-start justify-between">
+          <div key={index} className="rounded-2xl border border-border/50 bg-card/50 p-4 shadow-sm">
+            <div className="mb-3 flex items-start justify-between">
               <p className="font-medium text-foreground">{result.principalParts}</p>
-              <span
-                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                  result.isCorrect
-                    ? "bg-green-100 text-green-900 dark:bg-green-900/50 dark:text-green-100"
-                    : "bg-red-100 text-red-900 dark:bg-red-900/50 dark:text-red-100"
-                }`}
-              >
-                {result.isCorrect ? "Correct" : "Incorrect"}
-              </span>
+              {result.isCorrect ? (
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="flex-shrink-0"
+                  aria-label="Correct"
+                >
+                  <circle cx="12" cy="12" r="10" stroke="#22c55e" strokeWidth="2" />
+                  <path d="M8 12l3 3 5-6" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              ) : (
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="flex-shrink-0"
+                  aria-label="Incorrect"
+                >
+                  <circle cx="12" cy="12" r="10" stroke="#ef4444" strokeWidth="2" />
+                </svg>
+              )}
             </div>
             <p className="mb-1 text-sm text-muted-foreground">Votre réponse : {result.userAnswer}</p>
             {!result.isCorrect && (

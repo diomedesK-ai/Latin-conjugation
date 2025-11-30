@@ -1,8 +1,0 @@
-{
-  "/_global-error/page": "app/_global-error/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/congratulate/route": "app/api/congratulate/route.js",
-  "/api/generate-verbs/route": "app/api/generate-verbs/route.js",
-  "/api/validate/route": "app/api/validate/route.js",
-  "/page": "app/page.js"
-}

@@ -10,6 +10,7 @@ import { Tutorial } from "@/components/tutorial"
 import { HeaderIcons } from "@/components/header-icons"
 import { LeaderboardModal } from "@/components/leaderboard-modal"
 import { ResetModal } from "@/components/reset-modal"
+import { PoemDisplay } from "@/components/poem-display"
 
 export type ExerciseResult = {
   verb: string
@@ -31,7 +32,7 @@ export default function Home() {
   const [showTutorial, setShowTutorial] = useState(true)
   const [showLeaderboardModal, setShowLeaderboardModal] = useState(false)
   const [showResetModal, setShowResetModal] = useState(false)
-  const [step, setStep] = useState<"name" | "count" | "exercise" | "results">("name")
+  const [step, setStep] = useState<"name" | "poem" | "count" | "exercise" | "results">("name")
   const [studentName, setStudentName] = useState("")
   const [verbCount, setVerbCount] = useState(10)
   const [verificationMode, setVerificationMode] = useState<"per-step" | "at-end">("per-step")
@@ -66,6 +67,10 @@ export default function Home() {
 
   const handleNameSubmit = (name: string) => {
     setStudentName(name)
+    setStep("poem")
+  }
+
+  const handlePoemComplete = () => {
     setStep("count")
   }
 
@@ -130,6 +135,8 @@ export default function Home() {
         </div>
 
         {step === "name" && <NameEntry onSubmit={handleNameSubmit} />}
+
+        {step === "poem" && <PoemDisplay studentName={studentName} onComplete={handlePoemComplete} />}
 
         {step === "count" && <VerbCountSelect studentName={studentName} onSubmit={handleCountSubmit} />}
 

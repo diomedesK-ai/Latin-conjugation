@@ -3,7 +3,7 @@ import { generateObject } from "ai"
 import { z } from "zod"
 
 const openai = createOpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY,
 })
 
 const VerbSchema = z.object({
@@ -46,7 +46,7 @@ EXEMPLES DE STRUCTURE:
 Assure-toi que les conjugaisons sont EXACTES et conformes à la grammaire latine classique.`
 
     const { object } = await generateObject({
-      model: openai("gpt-4.1-turbo"),
+      model: openai("gpt-5.1"),
       schema: VerbSchema,
       prompt,
     })
