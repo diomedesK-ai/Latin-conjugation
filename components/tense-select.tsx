@@ -127,14 +127,26 @@ export function TenseSelect({ studentName, onSubmit, onBack }: TenseSelectProps)
                       {isSelected && (
                         <div className="w-2 h-2 rounded-full rainbow-dot" />
                       )}
-                      <span className={`font-semibold text-sm ${isInfectum ? "text-black" : "text-white"}`}>
+                      <span className={`font-semibold text-sm ${
+                        isInfectum 
+                          ? isSelected ? "text-black" : "text-black dark:text-gray-600" 
+                          : "text-white"
+                      }`}>
                         {tense.label}
                       </span>
                     </div>
-                    <div className={`text-[10px] ${isInfectum ? "text-gray-500" : "text-gray-400"}`}>
+                    <div className={`text-[10px] ${
+                      isInfectum 
+                        ? isSelected ? "text-gray-500" : "text-gray-500 dark:text-gray-600" 
+                        : "text-gray-400"
+                    }`}>
                       {tense.description}
                     </div>
-                    <div className={`text-[9px] font-mono mt-1 ${isInfectum ? "text-gray-400" : "text-gray-500"}`}>
+                    <div className={`text-[9px] font-mono mt-1 ${
+                      isInfectum 
+                        ? isSelected ? "text-gray-400" : "text-gray-400 dark:text-gray-600" 
+                        : "text-gray-500"
+                    }`}>
                       {tense.example}
                     </div>
                   </div>
