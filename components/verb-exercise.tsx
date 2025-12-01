@@ -10,11 +10,12 @@ type VerbExerciseProps = {
   studentName: string
   verbCount: number
   categories: string[]
+  tense: "present" | "imperfect"
   verificationMode: "per-step" | "at-end"
   onComplete: (results: ExerciseResult[], timeInSeconds: number) => void
 }
 
-export function VerbExercise({ studentName, verbCount, categories, verificationMode, onComplete }: VerbExerciseProps) {
+export function VerbExercise({ studentName, verbCount, categories, tense, verificationMode, onComplete }: VerbExerciseProps) {
   const [verbs, setVerbs] = useState<LatinVerb[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({
@@ -70,10 +71,19 @@ export function VerbExercise({ studentName, verbCount, categories, verificationM
 
   const currentVerb = verbs[currentIndex]
 
+  const getConjugation = useCallback((verb: LatinVerb) => {
+    if (tense === "present") {
+      return verb.presentConjugation
+    }
+    // Fallback to present if imperfect is not available
+    return verb.imperfectConjugation || verb.presentConjugation
+  }, [tense])
+
   const validateAnswer = useCallback(
     async (verbToValidate: LatinVerb, answerToValidate: typeof answers) => {
       const userAnswer = `${answerToValidate.singular1}, ${answerToValidate.singular2}, ${answerToValidate.singular3}, ${answerToValidate.plural1}, ${answerToValidate.plural2}, ${answerToValidate.plural3}`
-      const correctAnswer = verbToValidate.presentConjugation.join(", ")
+      const conjugation = getConjugation(verbToValidate)
+      const correctAnswer = conjugation.join(", ")
 
       try {
         const response = await fetch("/api/validate", {
@@ -86,6 +96,7 @@ export function VerbExercise({ studentName, verbCount, categories, verificationM
             correctAnswer,
             studentName,
             category: verbToValidate.category,
+            tense,
           }),
         })
 
@@ -101,13 +112,14 @@ export function VerbExercise({ studentName, verbCount, categories, verificationM
           category: verbToValidate.category,
         }
       } catch {
+        const conjugation = getConjugation(verbToValidate)
         const isCorrect =
-          answerToValidate.singular1.toLowerCase().trim() === verbToValidate.presentConjugation[0].toLowerCase() &&
-          answerToValidate.singular2.toLowerCase().trim() === verbToValidate.presentConjugation[1].toLowerCase() &&
-          answerToValidate.singular3.toLowerCase().trim() === verbToValidate.presentConjugation[2].toLowerCase() &&
-          answerToValidate.plural1.toLowerCase().trim() === verbToValidate.presentConjugation[3].toLowerCase() &&
-          answerToValidate.plural2.toLowerCase().trim() === verbToValidate.presentConjugation[4].toLowerCase() &&
-          answerToValidate.plural3.toLowerCase().trim() === verbToValidate.presentConjugation[5].toLowerCase()
+          answerToValidate.singular1.toLowerCase().trim() === conjugation[0].toLowerCase() &&
+          answerToValidate.singular2.toLowerCase().trim() === conjugation[1].toLowerCase() &&
+          answerToValidate.singular3.toLowerCase().trim() === conjugation[2].toLowerCase() &&
+          answerToValidate.plural1.toLowerCase().trim() === conjugation[3].toLowerCase() &&
+          answerToValidate.plural2.toLowerCase().trim() === conjugation[4].toLowerCase() &&
+          answerToValidate.plural3.toLowerCase().trim() === conjugation[5].toLowerCase()
 
         const fallbackFeedback = isCorrect ? "Correct ! Bien joué." : `La bonne réponse est : ${correctAnswer}`
 
@@ -122,7 +134,7 @@ export function VerbExercise({ studentName, verbCount, categories, verificationM
         }
       }
     },
-    [studentName],
+    [studentName, getConjugation],
   )
 
   const handleSubmitCurrent = async () => {
@@ -143,7 +155,7 @@ export function VerbExercise({ studentName, verbCount, categories, verificationM
         answers.plural2,
         answers.plural3,
       ]
-      const correctAnswers = currentVerb.presentConjugation
+      const correctAnswers = getConjugation(currentVerb)
 
       userAnswers.forEach((userAnswer, index) => {
         if (userAnswer.toLowerCase().trim() !== correctAnswers[index].toLowerCase()) {
@@ -258,7 +270,9 @@ export function VerbExercise({ studentName, verbCount, categories, verificationM
       </div>
 
       <div className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
-        <p className="mb-1 text-sm text-muted-foreground">Conjuguez au présent :</p>
+        <p className="mb-1 text-sm text-muted-foreground">
+          Conjuguez à l'{tense === "present" ? "indicatif présent" : "imparfait"} :
+        </p>
         <p className="text-xl font-medium text-foreground">
           {currentVerb.firstPerson}, {currentVerb.secondPerson}, {currentVerb.infinitive}
         </p>

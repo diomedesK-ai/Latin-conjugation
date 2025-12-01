@@ -18,27 +18,35 @@ type TutorialStep = {
 const steps: TutorialStep[] = [
   {
     title: "Bienvenue",
-    description: "Apprenez la conjugaison latine de manière interactive et personnalisée",
+    description: "Apprenez la conjugaison latine de manière interactive avec des verbes générés par IA",
   },
   {
     title: "Entrez votre nom",
     description: "Personnalisez votre expérience d'apprentissage",
   },
   {
-    title: "Choisissez votre mode",
-    description: "Feedback immédiat ou résultats complets à la fin - à vous de choisir",
+    title: "Choisissez le temps",
+    description: "Pratiquez au présent (actions actuelles) ou à l'imparfait (actions passées continues)",
+    example: {
+      verb: "Présent → terminaisons : -o, -s, -t, -mus, -tis, -nt",
+      answer: "Imparfait → terminaisons : -bam, -bas, -bat, -bamus, -batis, -bant"
+    }
+  },
+  {
+    title: "Sélectionnez les catégories",
+    description: "Choisissez les conjugaisons à pratiquer : 1ère, 2ème, 3ème, 4ème ou irréguliers",
   },
   {
     title: "Conjuguez",
-    description: "Pratiquez les 6 formes du présent de l'indicatif",
+    description: "Pratiquez les 6 formes du temps choisi (minimum 6 verbes)",
     example: {
-      verb: "moneo, mones, monere (avertir, conseiller)",
-      answer: "moneo, mones, monet, monemus, monetis, monent"
+      verb: "video, vides, videre (voir) - à l'imparfait",
+      answer: "videbam, videbas, videbat, videbamus, videbatis, videbant"
     }
   },
   {
     title: "Progressez",
-    description: "Suivez vos performances et améliorez-vous au fil du temps",
+    description: "L'IA vous donne un feedback personnalisé et suit vos performances",
   },
 ]
 

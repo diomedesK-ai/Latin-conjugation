@@ -167,3 +167,4 @@ Created by [diomedesK-ai](https://github.com/diomedesK-ai)
 
 **Note**: This application requires an OpenAI API key. Usage may incur costs based on your OpenAI plan. Monitor your usage at [platform.openai.com](https://platform.openai.com/).
 
+

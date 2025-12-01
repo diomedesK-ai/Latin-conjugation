@@ -5,6 +5,7 @@ export type LatinVerb = {
   meaning: string // Now in French
   conjugation: 1 | 2 | 3 | 4 | "irregular"
   presentConjugation: [string, string, string, string, string, string]
+  imperfectConjugation?: [string, string, string, string, string, string]
   isCompound?: boolean
   category?: string
 }
@@ -18,6 +19,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "aimer",
     conjugation: 1,
     presentConjugation: ["amo", "amas", "amat", "amamus", "amatis", "amant"],
+    imperfectConjugation: ["amabam", "amabas", "amabat", "amabamus", "amabatis", "amabant"],
   },
   {
     firstPerson: "laudo",
@@ -26,6 +28,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "louer, féliciter",
     conjugation: 1,
     presentConjugation: ["laudo", "laudas", "laudat", "laudamus", "laudatis", "laudant"],
+    imperfectConjugation: ["laudabam", "laudabas", "laudabat", "laudabamus", "laudabatis", "laudabant"],
   },
   {
     firstPerson: "paro",
@@ -34,6 +37,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "préparer",
     conjugation: 1,
     presentConjugation: ["paro", "paras", "parat", "paramus", "paratis", "parant"],
+    imperfectConjugation: ["parabam", "parabas", "parabat", "parabamus", "parabatis", "parabant"],
   },
   {
     firstPerson: "voco",
@@ -42,6 +46,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "appeler",
     conjugation: 1,
     presentConjugation: ["voco", "vocas", "vocat", "vocamus", "vocatis", "vocant"],
+    imperfectConjugation: ["vocabam", "vocabas", "vocabat", "vocabamus", "vocabatis", "vocabant"],
   },
   {
     firstPerson: "porto",
@@ -50,6 +55,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "porter, transporter",
     conjugation: 1,
     presentConjugation: ["porto", "portas", "portat", "portamus", "portatis", "portant"],
+    imperfectConjugation: ["portabam", "portabas", "portabat", "portabamus", "portabatis", "portabant"],
   },
   {
     firstPerson: "narro",
@@ -58,6 +64,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "raconter",
     conjugation: 1,
     presentConjugation: ["narro", "narras", "narrat", "narramus", "narratis", "narrant"],
+    imperfectConjugation: ["narrabam", "narrabas", "narrabat", "narrabamus", "narrabatis", "narrabant"],
   },
   {
     firstPerson: "specto",
@@ -66,6 +73,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "regarder, observer",
     conjugation: 1,
     presentConjugation: ["specto", "spectas", "spectat", "spectamus", "spectatis", "spectant"],
+    imperfectConjugation: ["spectabam", "spectabas", "spectabat", "spectabamus", "spectabatis", "spectabant"],
   },
 
   // 2ème Conjugaison (-ere avec e long)
@@ -76,6 +84,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "avertir, conseiller",
     conjugation: 2,
     presentConjugation: ["moneo", "mones", "monet", "monemus", "monetis", "monent"],
+    imperfectConjugation: ["monebam", "monebas", "monebat", "monebamus", "monebatis", "monebant"],
   },
   {
     firstPerson: "habeo",
@@ -84,6 +93,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "avoir, tenir",
     conjugation: 2,
     presentConjugation: ["habeo", "habes", "habet", "habemus", "habetis", "habent"],
+    imperfectConjugation: ["habebam", "habebas", "habebat", "habebamus", "habebatis", "habebant"],
   },
   {
     firstPerson: "video",
@@ -92,6 +102,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "voir",
     conjugation: 2,
     presentConjugation: ["video", "vides", "videt", "videmus", "videtis", "vident"],
+    imperfectConjugation: ["videbam", "videbas", "videbat", "videbamus", "videbatis", "videbant"],
   },
   {
     firstPerson: "teneo",
@@ -100,6 +111,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "tenir, garder",
     conjugation: 2,
     presentConjugation: ["teneo", "tenes", "tenet", "tenemus", "tenetis", "tenent"],
+    imperfectConjugation: ["tenebam", "tenebas", "tenebat", "tenebamus", "tenebatis", "tenebant"],
   },
   {
     firstPerson: "doceo",
@@ -108,6 +120,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "enseigner",
     conjugation: 2,
     presentConjugation: ["doceo", "doces", "docet", "docemus", "docetis", "docent"],
+    imperfectConjugation: ["docebam", "docebas", "docebat", "docebamus", "docebatis", "docebant"],
   },
   {
     firstPerson: "moveo",
@@ -116,6 +129,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "mouvoir, déplacer",
     conjugation: 2,
     presentConjugation: ["moveo", "moves", "movet", "movemus", "movetis", "movent"],
+    imperfectConjugation: ["movebam", "movebas", "movebat", "movebamus", "movebatis", "movebant"],
   },
   {
     firstPerson: "timeo",
@@ -124,6 +138,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "craindre",
     conjugation: 2,
     presentConjugation: ["timeo", "times", "timet", "timemus", "timetis", "timent"],
+    imperfectConjugation: ["timebam", "timebas", "timebat", "timebamus", "timebatis", "timebant"],
   },
 
   // 3ème Conjugaison (-ere avec e bref)
@@ -134,6 +149,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "conduire, mener",
     conjugation: 3,
     presentConjugation: ["duco", "ducis", "ducit", "ducimus", "ducitis", "ducunt"],
+    imperfectConjugation: ["ducebam", "ducebas", "ducebat", "ducebamus", "ducebatis", "ducebant"],
   },
   {
     firstPerson: "scribo",
@@ -142,6 +158,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "écrire",
     conjugation: 3,
     presentConjugation: ["scribo", "scribis", "scribit", "scribimus", "scribitis", "scribunt"],
+    imperfectConjugation: ["scribebam", "scribebas", "scribebat", "scribebamus", "scribebatis", "scribebant"],
   },
   {
     firstPerson: "lego",
@@ -150,6 +167,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "lire, choisir",
     conjugation: 3,
     presentConjugation: ["lego", "legis", "legit", "legimus", "legitis", "legunt"],
+    imperfectConjugation: ["legebam", "legebas", "legebat", "legebamus", "legebatis", "legebant"],
   },
   {
     firstPerson: "mitto",
@@ -158,6 +176,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "envoyer",
     conjugation: 3,
     presentConjugation: ["mitto", "mittis", "mittit", "mittimus", "mittitis", "mittunt"],
+    imperfectConjugation: ["mittebam", "mittebas", "mittebat", "mittebamus", "mittebatis", "mittebant"],
   },
   {
     firstPerson: "pono",
@@ -166,6 +185,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "poser, placer",
     conjugation: 3,
     presentConjugation: ["pono", "ponis", "ponit", "ponimus", "ponitis", "ponunt"],
+    imperfectConjugation: ["ponebam", "ponebas", "ponebat", "ponebamus", "ponebatis", "ponebant"],
   },
   {
     firstPerson: "dico",
@@ -174,6 +194,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "dire, parler",
     conjugation: 3,
     presentConjugation: ["dico", "dicis", "dicit", "dicimus", "dicitis", "dicunt"],
+    imperfectConjugation: ["dicebam", "dicebas", "dicebat", "dicebamus", "dicebatis", "dicebant"],
   },
   {
     firstPerson: "ago",
@@ -182,6 +203,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "faire, agir",
     conjugation: 3,
     presentConjugation: ["ago", "agis", "agit", "agimus", "agitis", "agunt"],
+    imperfectConjugation: ["agebam", "agebas", "agebat", "agebamus", "agebatis", "agebant"],
   },
   {
     firstPerson: "vinco",
@@ -190,6 +212,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "vaincre",
     conjugation: 3,
     presentConjugation: ["vinco", "vincis", "vincit", "vincimus", "vincitis", "vincunt"],
+    imperfectConjugation: ["vincebam", "vincebas", "vincebat", "vincebamus", "vincebatis", "vincebant"],
   },
 
   // 4ème Conjugaison (-ire)
@@ -200,6 +223,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "entendre, écouter",
     conjugation: 4,
     presentConjugation: ["audio", "audis", "audit", "audimus", "auditis", "audiunt"],
+    imperfectConjugation: ["audiebam", "audiebas", "audiebat", "audiebamus", "audiebatis", "audiebant"],
   },
   {
     firstPerson: "venio",
@@ -208,6 +232,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "venir",
     conjugation: 4,
     presentConjugation: ["venio", "venis", "venit", "venimus", "venitis", "veniunt"],
+    imperfectConjugation: ["veniebam", "veniebas", "veniebat", "veniebamus", "veniebatis", "veniebant"],
   },
   {
     firstPerson: "scio",
@@ -216,6 +241,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "savoir",
     conjugation: 4,
     presentConjugation: ["scio", "scis", "scit", "scimus", "scitis", "sciunt"],
+    imperfectConjugation: ["sciebam", "sciebas", "sciebat", "sciebamus", "sciebatis", "sciebant"],
   },
   {
     firstPerson: "dormio",
@@ -224,6 +250,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "dormir",
     conjugation: 4,
     presentConjugation: ["dormio", "dormis", "dormit", "dormimus", "dormitis", "dormiunt"],
+    imperfectConjugation: ["dormiebam", "dormiebas", "dormiebat", "dormiebamus", "dormiebatis", "dormiebant"],
   },
   {
     firstPerson: "sentio",
@@ -232,6 +259,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "sentir, percevoir",
     conjugation: 4,
     presentConjugation: ["sentio", "sentis", "sentit", "sentimus", "sentitis", "sentiunt"],
+    imperfectConjugation: ["sentiebam", "sentiebas", "sentiebat", "sentiebamus", "sentiebatis", "sentiebant"],
   },
 
   // Irrégulier : esse (être) et composés
@@ -242,6 +270,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "être",
     conjugation: "irregular",
     presentConjugation: ["sum", "es", "est", "sumus", "estis", "sunt"],
+    imperfectConjugation: ["eram", "eras", "erat", "eramus", "eratis", "erant"],
     isCompound: false,
   },
   {
@@ -251,6 +280,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "pouvoir",
     conjugation: "irregular",
     presentConjugation: ["possum", "potes", "potest", "possumus", "potestis", "possunt"],
+    imperfectConjugation: ["poteram", "poteras", "poterat", "poteramus", "poteratis", "poterant"],
     isCompound: true,
   },
   {
@@ -260,6 +290,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "être absent",
     conjugation: "irregular",
     presentConjugation: ["absum", "abes", "abest", "absumus", "abestis", "absunt"],
+    imperfectConjugation: ["aberam", "aberas", "aberat", "aberamus", "aberatis", "aberant"],
     isCompound: true,
   },
   {
@@ -269,6 +300,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "être présent, assister",
     conjugation: "irregular",
     presentConjugation: ["adsum", "ades", "adest", "adsumus", "adestis", "adsunt"],
+    imperfectConjugation: ["aderam", "aderas", "aderat", "aderamus", "aderatis", "aderant"],
     isCompound: true,
   },
   {
@@ -278,6 +310,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "être utile",
     conjugation: "irregular",
     presentConjugation: ["prosum", "prodes", "prodest", "prosumus", "prodestis", "prosunt"],
+    imperfectConjugation: ["proderam", "proderas", "proderat", "proderamus", "proderatis", "proderant"],
     isCompound: true,
   },
 
@@ -289,6 +322,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "faire, fabriquer",
     conjugation: 3,
     presentConjugation: ["facio", "facis", "facit", "facimus", "facitis", "faciunt"],
+    imperfectConjugation: ["faciebam", "faciebas", "faciebat", "faciebamus", "faciebatis", "faciebant"],
   },
   {
     firstPerson: "capio",
@@ -297,6 +331,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "prendre, saisir",
     conjugation: 3,
     presentConjugation: ["capio", "capis", "capit", "capimus", "capitis", "capiunt"],
+    imperfectConjugation: ["capiebam", "capiebas", "capiebat", "capiebamus", "capiebatis", "capiebant"],
   },
   {
     firstPerson: "fugio",
@@ -305,6 +340,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "fuir",
     conjugation: 3,
     presentConjugation: ["fugio", "fugis", "fugit", "fugimus", "fugitis", "fugiunt"],
+    imperfectConjugation: ["fugiebam", "fugiebas", "fugiebat", "fugiebamus", "fugiebatis", "fugiebant"],
   },
   {
     firstPerson: "eo",
@@ -313,6 +349,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "aller",
     conjugation: "irregular",
     presentConjugation: ["eo", "is", "it", "imus", "itis", "eunt"],
+    imperfectConjugation: ["ibam", "ibas", "ibat", "ibamus", "ibatis", "ibant"],
   },
   {
     firstPerson: "fero",
@@ -321,6 +358,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "porter, supporter",
     conjugation: "irregular",
     presentConjugation: ["fero", "fers", "fert", "ferimus", "fertis", "ferunt"],
+    imperfectConjugation: ["ferebam", "ferebas", "ferebat", "ferebamus", "ferebatis", "ferebant"],
   },
   {
     firstPerson: "volo",
@@ -329,6 +367,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "vouloir",
     conjugation: "irregular",
     presentConjugation: ["volo", "vis", "vult", "volumus", "vultis", "volunt"],
+    imperfectConjugation: ["volebam", "volebas", "volebat", "volebamus", "volebatis", "volebant"],
   },
   {
     firstPerson: "nolo",
@@ -337,6 +376,7 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "ne pas vouloir",
     conjugation: "irregular",
     presentConjugation: ["nolo", "non vis", "non vult", "nolumus", "non vultis", "nolunt"],
+    imperfectConjugation: ["nolebam", "nolebas", "nolebat", "nolebamus", "nolebatis", "nolebant"],
   },
   {
     firstPerson: "malo",
@@ -345,5 +385,6 @@ export const LATIN_VERBS: LatinVerb[] = [
     meaning: "préférer",
     conjugation: "irregular",
     presentConjugation: ["malo", "mavis", "mavult", "malumus", "mavultis", "malunt"],
+    imperfectConjugation: ["malebam", "malebas", "malebat", "malebamus", "malebatis", "malebant"],
   },
 ]

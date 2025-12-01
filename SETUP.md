@@ -94,3 +94,4 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - Verification can happen per-step or at the end of the exercise
 - The design follows Apple's minimal aesthetic principles
 
+
