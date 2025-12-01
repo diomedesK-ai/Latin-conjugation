@@ -55,48 +55,54 @@ export function PoemDisplay({ studentName, onComplete }: PoemDisplayProps) {
   }, [studentName])
 
   const renderPoem = () => {
-    // Clean up the text and extract only complete lines
+    // Clean up the text and extract only complete, valid lines
     const cleanText = streamedText.replace(/\[FR\]/gi, "\n[FR]").replace(/\[LA\]/gi, "\n[LA]")
     const lines = cleanText.split("\n").filter((line) => line.trim())
     
     const seenLines = new Set<string>()
-    const poemGroups: JSX.Element[] = []
-    let currentFrench: string | null = null
-    let groupIndex = 0
+    const frenchLines: string[] = []
+    const latinLines: string[] = []
     
     lines.forEach((line) => {
-      const frMatch = line.match(/\[FR\]\s*(.+)/i)
-      const laMatch = line.match(/\[LA\]\s*(.+)/i)
+      // Match [FR] or [LA] at the start, capture everything after
+      const frMatch = line.match(/^\[FR\]\s*(.+)$/i)
+      const laMatch = line.match(/^\[LA\]\s*(.+)$/i)
 
       if (frMatch) {
-        const text = frMatch[1].trim()
-        // Only show lines with at least 10 characters (to avoid partial fragments)
-        if (text.length >= 10 && !seenLines.has(`fr:${text}`)) {
-          currentFrench = text
+        let text = frMatch[1].trim()
+        // Remove any stray bracket fragments like [desFR] or incomplete tags
+        text = text.replace(/\[\s*\w*FR\s*\]/gi, '').replace(/\[\s*\w*LA\s*\]/gi, '').trim()
+        // Only show lines with at least 10 characters and no remaining brackets
+        if (text.length >= 10 && !text.includes('[') && !text.includes(']') && !seenLines.has(`fr:${text}`)) {
           seenLines.add(`fr:${text}`)
+          frenchLines.push(text)
         }
-      } else if (laMatch && currentFrench) {
-        const text = laMatch[1].trim()
-        // Only show lines with at least 10 characters (to avoid partial fragments)
-        if (text.length >= 10 && !seenLines.has(`la:${text}`)) {
+      } else if (laMatch) {
+        let text = laMatch[1].trim()
+        // Remove any stray bracket fragments
+        text = text.replace(/\[\s*\w*FR\s*\]/gi, '').replace(/\[\s*\w*LA\s*\]/gi, '').trim()
+        // Only show lines with at least 10 characters and no remaining brackets
+        if (text.length >= 10 && !text.includes('[') && !text.includes(']') && !seenLines.has(`la:${text}`)) {
           seenLines.add(`la:${text}`)
-          poemGroups.push(
-            <div key={`group-${groupIndex}`} className="poem-group">
-              <p className="poem-line poem-french">
-                {currentFrench}
-              </p>
-              <p className="poem-line poem-latin">
-                {text}
-              </p>
-            </div>
-          )
-          currentFrench = null
-          groupIndex++
+          latinLines.push(text)
         }
       }
     })
     
-    return poemGroups
+    return (
+      <>
+        {frenchLines.map((line, index) => (
+          <p key={`fr-${index}`} className="poem-line poem-french">
+            {line}
+          </p>
+        ))}
+        {latinLines.map((line, index) => (
+          <p key={`la-${index}`} className="poem-line poem-latin">
+            {line}
+          </p>
+        ))}
+      </>
+    )
   }
 
   return (

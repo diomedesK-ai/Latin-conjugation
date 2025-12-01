@@ -35,6 +35,18 @@
   @apply focus:shadow-[0_6px_35px_rgba(255,255,255,0.25)];
 }
 
+/* Error state for incorrect inputs */
+.input-error {
+  @apply border-red-500/60;
+  background: linear-gradient(to bottom, rgb(254 242 242), rgb(255 255 255)) !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2), 0 6px 35px rgba(239, 68, 68, 0.3) !important;
+}
+
+.dark .input-error {
+  background: linear-gradient(to bottom, rgb(127 29 29 / 0.2), rgb(0 0 0)) !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3), 0 6px 35px rgba(239, 68, 68, 0.4) !important;
+}
+
 /* Minimal icon button with glow - pure black/white */
 .icon-button, .theme-toggle {
   @apply rounded-full p-2.5 transition-all duration-300;
@@ -113,10 +125,6 @@
   margin: 0 auto;
 }
 
-.poem-group {
-  margin-bottom: 2rem;
-}
-
 .poem-line {
   font-size: 1.75rem;
   line-height: 1.8;
@@ -129,12 +137,18 @@
 .poem-french {
   color: rgb(107 114 128); /* Grey for light mode */
   font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.poem-french:last-of-type {
+  margin-bottom: 2rem; /* Space before Latin lines */
 }
 
 .poem-latin {
   color: rgb(0 0 0); /* Black for light mode */
   font-weight: 500;
   text-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  margin-top: 0.5rem;
 }
 
 /* Dark mode colors */

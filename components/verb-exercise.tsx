@@ -36,6 +36,7 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
   const [feedback, setFeedback] = useState<string | null>(null)
   const [showNext, setShowNext] = useState(false)
   const [startTime] = useState<number>(Date.now())
+  const [incorrectFields, setIncorrectFields] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     async function generateVerbs() {
@@ -126,9 +127,37 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
     if (verificationMode === "per-step") {
       setIsValidating(true)
       setFeedback(null)
+      setIncorrectFields(new Set())
 
+      // Check each field individually
+      const incorrect = new Set<string>()
+      const userAnswers = [
+        answers.singular1,
+        answers.singular2,
+        answers.singular3,
+        answers.plural1,
+        answers.plural2,
+        answers.plural3,
+      ]
+      const correctAnswers = currentVerb.presentConjugation
+
+      userAnswers.forEach((userAnswer, index) => {
+        if (userAnswer.toLowerCase().trim() !== correctAnswers[index].toLowerCase()) {
+          incorrect.add(
+            ["singular1", "singular2", "singular3", "plural1", "plural2", "plural3"][index]
+          )
+        }
+      })
+
+      if (incorrect.size > 0) {
+        setIncorrectFields(incorrect)
+        setFeedback(`Il y a ${incorrect.size} erreur${incorrect.size > 1 ? "s" : ""}. Corrigez les champs en rouge.`)
+        setIsValidating(false)
+        return
+      }
+
+      // All correct
       const result = await validateAnswer(currentVerb, answers)
-
       setFeedback(result.feedback)
       setShowNext(true)
       setResults((prev) => [...prev, result])
@@ -161,6 +190,7 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
       })
       setFeedback(null)
       setShowNext(false)
+      setIncorrectFields(new Set())
     }
   }
 
@@ -225,34 +255,55 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
             <p className="mb-3 text-sm font-medium text-foreground">Singulier</p>
             <div className="space-y-3">
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">1ère personne (ego)</label>
+                <label className="mb-1 block text-xs text-muted-foreground">ego</label>
                 <input
                   value={answers.singular1}
-                  onChange={(e) => setAnswers((prev) => ({ ...prev, singular1: e.target.value }))}
+                  onChange={(e) => {
+                    setAnswers((prev) => ({ ...prev, singular1: e.target.value }))
+                    if (incorrectFields.has("singular1")) {
+                      const newIncorrect = new Set(incorrectFields)
+                      newIncorrect.delete("singular1")
+                      setIncorrectFields(newIncorrect)
+                    }
+                  }}
                   placeholder=""
                   disabled={showNext && verificationMode === "per-step"}
-                  className="pill-input w-full"
+                  className={`pill-input w-full ${incorrectFields.has("singular1") ? "input-error" : ""}`}
                   autoFocus
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">2ème personne (tu)</label>
+                <label className="mb-1 block text-xs text-muted-foreground">tu</label>
                 <input
                   value={answers.singular2}
-                  onChange={(e) => setAnswers((prev) => ({ ...prev, singular2: e.target.value }))}
+                  onChange={(e) => {
+                    setAnswers((prev) => ({ ...prev, singular2: e.target.value }))
+                    if (incorrectFields.has("singular2")) {
+                      const newIncorrect = new Set(incorrectFields)
+                      newIncorrect.delete("singular2")
+                      setIncorrectFields(newIncorrect)
+                    }
+                  }}
                   placeholder=""
                   disabled={showNext && verificationMode === "per-step"}
-                  className="pill-input w-full"
+                  className={`pill-input w-full ${incorrectFields.has("singular2") ? "input-error" : ""}`}
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">3ème personne (is/ea/id)</label>
+                <label className="mb-1 block text-xs text-muted-foreground">is/ea/id</label>
                 <input
                   value={answers.singular3}
-                  onChange={(e) => setAnswers((prev) => ({ ...prev, singular3: e.target.value }))}
+                  onChange={(e) => {
+                    setAnswers((prev) => ({ ...prev, singular3: e.target.value }))
+                    if (incorrectFields.has("singular3")) {
+                      const newIncorrect = new Set(incorrectFields)
+                      newIncorrect.delete("singular3")
+                      setIncorrectFields(newIncorrect)
+                    }
+                  }}
                   placeholder=""
                   disabled={showNext && verificationMode === "per-step"}
-                  className="pill-input w-full"
+                  className={`pill-input w-full ${incorrectFields.has("singular3") ? "input-error" : ""}`}
                 />
               </div>
             </div>
@@ -261,33 +312,54 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
             <p className="mb-3 text-sm font-medium text-foreground">Pluriel</p>
             <div className="space-y-3">
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">1ère personne (nos)</label>
+                <label className="mb-1 block text-xs text-muted-foreground">nos</label>
                 <input
                   value={answers.plural1}
-                  onChange={(e) => setAnswers((prev) => ({ ...prev, plural1: e.target.value }))}
+                  onChange={(e) => {
+                    setAnswers((prev) => ({ ...prev, plural1: e.target.value }))
+                    if (incorrectFields.has("plural1")) {
+                      const newIncorrect = new Set(incorrectFields)
+                      newIncorrect.delete("plural1")
+                      setIncorrectFields(newIncorrect)
+                    }
+                  }}
                   placeholder=""
                   disabled={showNext && verificationMode === "per-step"}
-                  className="pill-input w-full"
+                  className={`pill-input w-full ${incorrectFields.has("plural1") ? "input-error" : ""}`}
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">2ème personne (vos)</label>
+                <label className="mb-1 block text-xs text-muted-foreground">vos</label>
                 <input
                   value={answers.plural2}
-                  onChange={(e) => setAnswers((prev) => ({ ...prev, plural2: e.target.value }))}
+                  onChange={(e) => {
+                    setAnswers((prev) => ({ ...prev, plural2: e.target.value }))
+                    if (incorrectFields.has("plural2")) {
+                      const newIncorrect = new Set(incorrectFields)
+                      newIncorrect.delete("plural2")
+                      setIncorrectFields(newIncorrect)
+                    }
+                  }}
                   placeholder=""
                   disabled={showNext && verificationMode === "per-step"}
-                  className="pill-input w-full"
+                  className={`pill-input w-full ${incorrectFields.has("plural2") ? "input-error" : ""}`}
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">3ème personne (ei/eae/ea)</label>
+                <label className="mb-1 block text-xs text-muted-foreground">ei/eae/ea</label>
                 <input
                   value={answers.plural3}
-                  onChange={(e) => setAnswers((prev) => ({ ...prev, plural3: e.target.value }))}
+                  onChange={(e) => {
+                    setAnswers((prev) => ({ ...prev, plural3: e.target.value }))
+                    if (incorrectFields.has("plural3")) {
+                      const newIncorrect = new Set(incorrectFields)
+                      newIncorrect.delete("plural3")
+                      setIncorrectFields(newIncorrect)
+                    }
+                  }}
                   placeholder=""
                   disabled={showNext && verificationMode === "per-step"}
-                  className="pill-input w-full"
+                  className={`pill-input w-full ${incorrectFields.has("plural3") ? "input-error" : ""}`}
                 />
               </div>
             </div>

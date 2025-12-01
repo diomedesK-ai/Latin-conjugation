@@ -11,26 +11,31 @@ export async function POST(request: Request) {
 
     const result = await streamText({
       model: openai("gpt-5.1"),
-      prompt: `Tu es un poète bienveillant qui écrit pour des enfants qui apprennent le latin.
+      prompt: `Tu es un poète francophone expert et professeur de latin. Écris un très court poème personnalisé (4 lignes) pour un élève nommé "${studentName}" qui commence son apprentissage du latin.
 
-Écris un très court poème personnalisé (4 lignes) pour un élève nommé "${studentName}" qui commence son apprentissage du latin.
+FORMAT STRICT - TOUT le français D'ABORD, puis TOUT le latin:
+[FR] Première phrase complète en français GRAMMATICALEMENT PARFAIT avec le prénom ${studentName}
+[FR] Deuxième phrase complète en français GRAMMATICALEMENT PARFAIT
+[LA] Traduction latine complète de la première phrase française
+[LA] Traduction latine complète de la deuxième phrase française
 
-FORMAT STRICT - Chaque ligne DOIT commencer sur une nouvelle ligne:
-[FR] Première ligne poétique en français avec le prénom ${studentName}
-[LA] Traduction latine de la première ligne
-[FR] Deuxième ligne poétique en français
-[LA] Traduction latine de la deuxième ligne
-
-RÈGLES STRICTES:
-- Positif, encourageant, adapté aux enfants
-- Français simple et élégant
-- Latin correct niveau débutant
-- Exactement 4 lignes au total (2 FR + 2 LA)
-- Chaque ligne DOIT commencer par [FR] ou [LA]
-- Une seule phrase courte par ligne
-- Pas d'emojis, pas de guillemets, pas de répétitions
+RÈGLES ABSOLUES:
+- Exactement 4 lignes (2 FR puis 2 LA)
+- D'ABORD les 2 lignes françaises [FR]
+- ENSUITE les 2 lignes latines [LA]
+- JAMAIS alterner FR/LA/FR/LA
+- Les lignes [FR] contiennent SEULEMENT du français grammaticalement correct (pas de fautes!)
+- Les lignes [LA] contiennent SEULEMENT du latin correct
+- Vérifie l'accord des adjectifs, conjugaisons, et syntaxe française
+- Positif, encourageant, poétique, adapté aux enfants
+- Pas d'emojis, pas de guillemets
 - Commence directement avec [FR]
-- IMPORTANT: Retour à la ligne après chaque phrase`,
+
+EXEMPLE DU BON FORMAT:
+[FR] Marie, ton cœur s'ouvre à la langue des anciens
+[FR] Chaque mot latin fait grandir ta lumière
+[LA] Maria, cor tuum linguae antiquorum aperitur
+[LA] Quodlibet verbum Latinum lucem tuam crescere facit`,
     })
 
     return result.toTextStreamResponse()

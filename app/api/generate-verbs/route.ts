@@ -9,13 +9,13 @@ const openai = createOpenAI({
 const VerbSchema = z.object({
   verbs: z.array(
     z.object({
-      firstPerson: z.string(),
-      secondPerson: z.string(),
-      infinitive: z.string(),
-      meaning: z.string(),
-      conjugation: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal("irregular")]),
-      presentConjugation: z.tuple([z.string(), z.string(), z.string(), z.string(), z.string(), z.string()]),
-      isCompound: z.boolean().optional(),
+      firstPerson: z.string().describe("1ère personne du singulier (ex: amo)"),
+      secondPerson: z.string().describe("2ème personne du singulier (ex: amas)"),
+      infinitive: z.string().describe("Infinitif présent (ex: amare)"),
+      meaning: z.string().describe("Sens en français"),
+      conjugation: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal("irregular")]).describe("Type de conjugaison"),
+      presentConjugation: z.array(z.string()).length(6).describe("Les 6 formes du présent: ego, tu, is/ea/id, nos, vos, ei/eae/ea"),
+      isCompound: z.boolean().optional().describe("Est-ce un verbe composé?"),
     }),
   ),
 })
