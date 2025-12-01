@@ -85,6 +85,7 @@ export function VerbExercise({ studentName, verbCount, categories, verificationM
             userAnswer,
             correctAnswer,
             studentName,
+            category: verbToValidate.category,
           }),
         })
 
@@ -247,11 +248,13 @@ export function VerbExercise({ studentName, verbCount, categories, verificationM
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <span>
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-muted-foreground">
           Verbe {currentIndex + 1} sur {verbs.length}
         </span>
-        <span>{studentName}</span>
+        <span className="inline-flex items-center rounded-full bg-black text-white px-3 py-1 text-xs font-medium shadow-[0_2px_10px_rgba(0,0,0,0.3)] dark:bg-white dark:text-black dark:shadow-[0_2px_10px_rgba(255,255,255,0.3)]">
+          {studentName}
+        </span>
       </div>
 
       <div className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
@@ -406,7 +409,21 @@ export function VerbExercise({ studentName, verbCount, categories, verificationM
                 </div>
               </div>
             )}
-            <p className="text-sm leading-relaxed flex-1">{feedback}</p>
+            <div className="text-sm leading-relaxed flex-1">
+              {feedback.split(/(\d+ère conj\.|2ème conj\.|3ème conj\.|3ème mixte|4ème conj\.|composé|irrégulier)/g).map((part, index) => {
+                if (/\d+ère conj\.|2ème conj\.|3ème conj\.|3ème mixte|4ème conj\.|composé|irrégulier/.test(part)) {
+                  return (
+                    <span
+                      key={index}
+                      className="inline-flex items-center rounded-full bg-black text-white px-2.5 py-0.5 text-xs font-medium shadow-[0_2px_10px_rgba(0,0,0,0.3)] dark:bg-white dark:text-black dark:shadow-[0_2px_10px_rgba(255,255,255,0.3)] mx-1"
+                    >
+                      {part}
+                    </span>
+                  )
+                }
+                return <span key={index}>{part}</span>
+              })}
+            </div>
           </div>
         )}
 

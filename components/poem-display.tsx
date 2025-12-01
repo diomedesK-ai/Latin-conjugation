@@ -8,7 +8,8 @@ type PoemDisplayProps = {
 }
 
 export function PoemDisplay({ studentName, onComplete }: PoemDisplayProps) {
-  const [streamedText, setStreamedText] = useState("")
+  const [poemText, setPoemText] = useState("")
+  const [displayedChars, setDisplayedChars] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
 
   useEffect(() => {
@@ -20,98 +21,97 @@ export function PoemDisplay({ studentName, onComplete }: PoemDisplayProps) {
           body: JSON.stringify({ studentName }),
         })
 
-        if (!response.ok || !response.body) {
+        if (!response.ok) {
           throw new Error("Failed to generate poem")
         }
 
-        const reader = response.body.getReader()
-        const decoder = new TextDecoder()
-
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) {
-            setIsComplete(true)
-            break
-          }
-
-          const chunk = decoder.decode(value, { stream: true })
-          setStreamedText((prev) => prev + chunk)
-        }
+        const text = await response.text()
+        setPoemText(text)
       } catch (err) {
         console.error("Poem generation error:", err)
-        // Fallback
-        const fallback = `[FR] Bienvenue ${studentName}, dans ce voyage enchanté\n[LA] Salve in hoc itinere magnifico\n[FR] Le latin t'ouvre ses portes dorées\n[LA] Lingua Latina portas tibi aperit`
-        
-        // Simulate streaming for fallback
-        for (let i = 0; i < fallback.length; i++) {
-          await new Promise(resolve => setTimeout(resolve, 30))
-          setStreamedText(fallback.slice(0, i + 1))
-        }
-        setIsComplete(true)
+        // Fallback poem
+        setPoemText(`[FR] ${studentName}, ta curiosité ouvre les portes du savoir\n[FR] Chaque effort te rapproche des trésors de la connaissance\n[LA] ${studentName}, curiositas tua portas scientiae aperit\n[LA] Quodlibet studium te ad thesauros cognitionis propius ducit`)
       }
     }
 
     fetchPoem()
   }, [studentName])
 
-  const renderPoem = () => {
-    if (!isComplete) return null // Only show when complete to avoid fragments
+  // Typewriter effect
+  useEffect(() => {
+    if (!poemText) return
+
+    if (displayedChars < poemText.length) {
+      const timer = setTimeout(() => {
+        setDisplayedChars(prev => prev + 1)
+      }, 25)
+      return () => clearTimeout(timer)
+    } else {
+      setIsComplete(true)
+    }
+  }, [poemText, displayedChars])
+
+  const parsePoem = () => {
+    if (!poemText) return { frenchLines: [], latinLines: [] }
     
-    // Clean up the text and extract only complete, valid lines
-    const cleanText = streamedText
-      .replace(/\[FR\]/gi, "\n[FR]")
-      .replace(/\[LA\]/gi, "\n[LA]")
-      .replace(/\n+/g, "\n") // Remove duplicate newlines
-    
-    const lines = cleanText.split("\n").filter((line) => line.trim())
+    const lines = poemText.split("\n").filter((line) => line.trim())
     
     const frenchLines: string[] = []
     const latinLines: string[] = []
-    const seenContent = new Set<string>()
     
     lines.forEach((line) => {
-      // Match [FR] or [LA] at the start, capture everything after
       const frMatch = line.match(/^\[FR\]\s*(.+)$/i)
       const laMatch = line.match(/^\[LA\]\s*(.+)$/i)
 
       if (frMatch) {
-        let text = frMatch[1]
-          .trim()
-          .replace(/\[.*?\]/g, '') // Remove any bracket tags
-          .replace(/\s+/g, ' ') // Normalize spaces
-          .trim()
-        
-        // Only show lines with at least 15 characters and not seen before
-        if (text.length >= 15 && !seenContent.has(text.toLowerCase())) {
-          seenContent.add(text.toLowerCase())
-          frenchLines.push(text)
-        }
+        const text = frMatch[1].trim()
+        if (text.length > 10) frenchLines.push(text)
       } else if (laMatch) {
-        let text = laMatch[1]
-          .trim()
-          .replace(/\[.*?\]/g, '') // Remove any bracket tags
-          .replace(/\s+/g, ' ') // Normalize spaces
-          .trim()
-        
-        // Only show lines with at least 15 characters and not seen before
-        if (text.length >= 15 && !seenContent.has(text.toLowerCase())) {
-          seenContent.add(text.toLowerCase())
-          latinLines.push(text)
-        }
+        const text = laMatch[1].trim()
+        if (text.length > 10) latinLines.push(text)
       }
     })
     
-    // Limit to 2 French and 2 Latin lines
+    return { frenchLines: frenchLines.slice(0, 2), latinLines: latinLines.slice(0, 2) }
+  }
+
+  const renderPoem = () => {
+    const { frenchLines, latinLines } = parsePoem()
+    const displayText = poemText.slice(0, displayedChars)
+    
+    // Parse the currently displayed text to show typewriter effect
+    const displayLines = displayText.split("\n").filter((line) => line.trim())
+    
+    const displayedFrench: string[] = []
+    const displayedLatin: string[] = []
+    
+    displayLines.forEach((line) => {
+      const frMatch = line.match(/^\[FR\]\s*(.*)$/i)
+      const laMatch = line.match(/^\[LA\]\s*(.*)$/i)
+
+      if (frMatch) {
+        displayedFrench.push(frMatch[1])
+      } else if (laMatch) {
+        displayedLatin.push(laMatch[1])
+      }
+    })
+    
     return (
       <>
-        {frenchLines.slice(0, 2).map((line, index) => (
+        {frenchLines.map((line, index) => (
           <p key={`fr-${index}`} className="poem-line poem-french">
-            {line}
+            {displayedFrench[index] || ""}
+            {!isComplete && displayedFrench.length === index + 1 && displayedFrench[index]?.length < line.length && (
+              <span className="poem-cursor">|</span>
+            )}
           </p>
         ))}
-        {latinLines.slice(0, 2).map((line, index) => (
+        {latinLines.map((line, index) => (
           <p key={`la-${index}`} className="poem-line poem-latin">
-            {line}
+            {displayedLatin[index] || ""}
+            {!isComplete && displayedLatin.length === index + 1 && displayedLatin[index]?.length < line.length && (
+              <span className="poem-cursor">|</span>
+            )}
           </p>
         ))}
       </>
@@ -121,8 +121,8 @@ export function PoemDisplay({ studentName, onComplete }: PoemDisplayProps) {
   return (
     <div className="poem-wrapper">
       <div className="poem-container">
-        {renderPoem()}
-        {!isComplete && <span className="poem-cursor">|</span>}
+        {poemText && renderPoem()}
+        {!poemText && <span className="poem-cursor">|</span>}
       </div>
 
       {isComplete && (
