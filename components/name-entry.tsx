@@ -36,7 +36,7 @@ export function NameEntry({ onSubmit }: NameEntryProps) {
             setError("")
           }}
           placeholder="Entrez votre nom"
-          className="pill-input w-full text-base"
+          className="pill-input-rainbow w-full text-base"
           autoFocus
         />
         {error && (
