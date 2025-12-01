@@ -7,9 +7,10 @@ import { useState } from "react"
 type VerbCountSelectProps = {
   studentName: string
   onSubmit: (count: number, mode: "per-step" | "at-end") => void
+  onBack?: () => void
 }
 
-export function VerbCountSelect({ studentName, onSubmit }: VerbCountSelectProps) {
+export function VerbCountSelect({ studentName, onSubmit, onBack }: VerbCountSelectProps) {
   const [count, setCount] = useState("10")
   const [mode, setMode] = useState<"per-step" | "at-end">("per-step")
   const [error, setError] = useState("")
@@ -89,7 +90,16 @@ export function VerbCountSelect({ studentName, onSubmit }: VerbCountSelectProps)
         </div>
       </div>
 
-      <div className="flex justify-center pt-2">
+      <div className="flex justify-center gap-3 pt-2">
+        {onBack && (
+          <button 
+            type="button" 
+            onClick={onBack}
+            className="rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+          >
+            Retour
+          </button>
+        )}
         <button type="submit" className="pill-glow">
           Commencer
         </button>

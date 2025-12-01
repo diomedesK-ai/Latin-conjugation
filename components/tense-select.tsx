@@ -7,9 +7,10 @@ import { TENSE_INFO, type TenseSystem, type LatinTense } from "@/lib/latin-verbs
 type TenseSelectProps = {
   studentName: string
   onSubmit: (tenseSystem: TenseSystem, tense: LatinTense) => void
+  onBack?: () => void
 }
 
-export function TenseSelect({ studentName, onSubmit }: TenseSelectProps) {
+export function TenseSelect({ studentName, onSubmit, onBack }: TenseSelectProps) {
   const [selectedSystem, setSelectedSystem] = useState<TenseSystem | null>(null)
   const [selectedTense, setSelectedTense] = useState<LatinTense | null>(null)
 
@@ -36,24 +37,24 @@ export function TenseSelect({ studentName, onSubmit }: TenseSelectProps) {
       </p>
 
       {/* Step 1: Select System (Infectum or Perfectum) */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <label className="block text-sm font-medium text-foreground">
           1. Choisissez le système verbal
         </label>
         <div className="grid grid-cols-2 gap-4">
-          {/* Infectum - White/Light theme */}
+          {/* Infectum - White/Light theme with rainbow glow when selected */}
           <button
             type="button"
             onClick={() => handleSystemSelect("infectum")}
-            className={`rounded-2xl p-5 text-left transition-all duration-300 border-2 ${
+            className={`rounded-2xl p-5 text-left transition-all duration-300 ${
               selectedSystem === "infectum"
-                ? "bg-white text-black border-gray-300 shadow-[0_4px_20px_rgba(0,0,0,0.15)] scale-[1.02]"
-                : "bg-white/80 text-gray-600 border-gray-200 hover:border-gray-300 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+                ? "text-black scale-[1.02] rainbow-glow-selected"
+                : "bg-white/80 text-gray-600 border-2 border-gray-200 hover:border-gray-300 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
             }`}
           >
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-gray-200 border border-gray-300" />
+                <div className={`indicator-dot ${selectedSystem === "infectum" ? "indicator-dot-infectum" : "bg-gray-200 border border-gray-300"}`} />
                 <span className="font-bold text-lg">{TENSE_INFO.infectum.label}</span>
               </div>
               <p className="text-xs text-gray-500">{TENSE_INFO.infectum.description}</p>
@@ -67,19 +68,19 @@ export function TenseSelect({ studentName, onSubmit }: TenseSelectProps) {
             </div>
           </button>
 
-          {/* Perfectum - Black/Dark theme */}
+          {/* Perfectum - Black/Dark theme with rainbow glow when selected */}
           <button
             type="button"
             onClick={() => handleSystemSelect("perfectum")}
-            className={`rounded-2xl p-5 text-left transition-all duration-300 border-2 ${
+            className={`rounded-2xl p-5 text-left transition-all duration-300 ${
               selectedSystem === "perfectum"
-                ? "bg-black text-white border-gray-700 shadow-[0_4px_20px_rgba(0,0,0,0.4)] scale-[1.02]"
-                : "bg-gray-900/90 text-gray-300 border-gray-700 hover:border-gray-600 hover:shadow-[0_2px_10px_rgba(0,0,0,0.3)]"
+                ? "text-white scale-[1.02] rainbow-glow-selected-dark"
+                : "bg-gray-900/90 text-gray-300 border-2 border-gray-700 hover:border-gray-600 hover:shadow-[0_2px_10px_rgba(0,0,0,0.3)]"
             }`}
           >
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-gray-700 border border-gray-500" />
+                <div className={`indicator-dot ${selectedSystem === "perfectum" ? "indicator-dot-perfectum" : "bg-gray-700 border border-gray-500"}`} />
                 <span className="font-bold text-lg">{TENSE_INFO.perfectum.label}</span>
               </div>
               <p className="text-xs text-gray-400">{TENSE_INFO.perfectum.description}</p>
@@ -97,7 +98,7 @@ export function TenseSelect({ studentName, onSubmit }: TenseSelectProps) {
 
       {/* Step 2: Select specific tense within the system */}
       {selectedSystem && (
-        <div className="space-y-4 animate-fade-in">
+        <div className="space-y-5 animate-fade-in">
           <label className="block text-sm font-medium text-foreground">
             2. Choisissez le temps
           </label>
@@ -111,19 +112,24 @@ export function TenseSelect({ studentName, onSubmit }: TenseSelectProps) {
                   key={key}
                   type="button"
                   onClick={() => handleTenseSelect(key as LatinTense)}
-                  className={`rounded-xl p-4 text-left transition-all duration-300 border ${
+                  className={`rounded-xl p-4 text-left transition-all duration-300 ${
                     isInfectum
                       ? isSelected
-                        ? "bg-white text-black border-gray-300 shadow-[0_3px_15px_rgba(0,0,0,0.12)] scale-[1.02]"
-                        : "bg-white/60 text-gray-600 border-gray-200 hover:bg-white hover:border-gray-300"
+                        ? "text-black scale-[1.02] rainbow-glow-selected-subtle"
+                        : "bg-white/60 text-gray-600 border-2 border-gray-200 hover:bg-white hover:border-gray-300"
                       : isSelected
-                        ? "bg-black text-white border-gray-600 shadow-[0_3px_15px_rgba(0,0,0,0.35)] scale-[1.02]"
-                        : "bg-gray-900/80 text-gray-300 border-gray-700 hover:bg-gray-900 hover:border-gray-600"
+                        ? "text-white scale-[1.02] rainbow-glow-selected-subtle-dark"
+                        : "bg-gray-900/80 text-gray-300 border-2 border-gray-700 hover:bg-gray-900 hover:border-gray-600"
                   }`}
                 >
                   <div className="space-y-1.5">
-                    <div className={`font-semibold text-sm ${isInfectum ? "text-black" : "text-white"}`}>
-                      {tense.label}
+                    <div className="flex items-center gap-2">
+                      {isSelected && (
+                        <div className="w-2 h-2 rounded-full rainbow-dot" />
+                      )}
+                      <span className={`font-semibold text-sm ${isInfectum ? "text-black" : "text-white"}`}>
+                        {tense.label}
+                      </span>
                     </div>
                     <div className={`text-[10px] ${isInfectum ? "text-gray-500" : "text-gray-400"}`}>
                       {tense.description}
@@ -141,10 +147,10 @@ export function TenseSelect({ studentName, onSubmit }: TenseSelectProps) {
 
       {/* Selected summary */}
       {selectedSystem && selectedTense && (
-        <div className={`rounded-xl p-4 border animate-fade-in ${
+        <div className={`rounded-xl p-4 animate-fade-in ${
           selectedSystem === "infectum"
-            ? "bg-gray-50 border-gray-200"
-            : "bg-gray-900 border-gray-700"
+            ? "rainbow-glow-selected-subtle"
+            : "rainbow-glow-selected-subtle-dark"
         }`}>
           <p className={`text-sm ${selectedSystem === "infectum" ? "text-gray-700" : "text-gray-300"}`}>
             <span className="font-medium">Sélection :</span>{" "}
@@ -153,6 +159,7 @@ export function TenseSelect({ studentName, onSubmit }: TenseSelectProps) {
                 ? "bg-white text-black border border-gray-300"
                 : "bg-black text-white border border-gray-600"
             }`}>
+              <span className="w-1.5 h-1.5 rounded-full rainbow-dot" />
               {TENSE_INFO[selectedSystem].label}
             </span>
             {" → "}
@@ -166,7 +173,16 @@ export function TenseSelect({ studentName, onSubmit }: TenseSelectProps) {
         </div>
       )}
 
-      <div className="flex justify-center pt-2">
+      <div className="flex justify-center gap-3 pt-2">
+        {onBack && (
+          <button 
+            type="button" 
+            onClick={onBack}
+            className="rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+          >
+            Retour
+          </button>
+        )}
         <button 
           type="submit" 
           disabled={!selectedSystem || !selectedTense}

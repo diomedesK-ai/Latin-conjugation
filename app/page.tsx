@@ -162,11 +162,29 @@ export default function Home() {
 
         {step === "poem" && <PoemDisplay studentName={studentName} onComplete={handlePoemComplete} />}
 
-        {step === "tense" && <TenseSelect studentName={studentName} onSubmit={handleTenseSubmit} />}
+        {step === "tense" && (
+          <TenseSelect 
+            studentName={studentName} 
+            onSubmit={handleTenseSubmit}
+            onBack={() => setStep("name")}
+          />
+        )}
 
-        {step === "categories" && <VerbCategorySelect studentName={studentName} onSubmit={handleCategoriesSubmit} />}
+        {step === "categories" && (
+          <VerbCategorySelect 
+            studentName={studentName} 
+            onSubmit={handleCategoriesSubmit} 
+            onBack={() => setStep("tense")}
+          />
+        )}
 
-        {step === "count" && <VerbCountSelect studentName={studentName} onSubmit={handleCountSubmit} />}
+        {step === "count" && (
+          <VerbCountSelect 
+            studentName={studentName} 
+            onSubmit={handleCountSubmit}
+            onBack={() => setStep("categories")}
+          />
+        )}
 
         {step === "exercise" && (
           <VerbExercise

@@ -5,6 +5,7 @@ import { useState } from "react"
 type VerbCategorySelectProps = {
   studentName: string
   onSubmit: (categories: string[]) => void
+  onBack?: () => void
 }
 
 const categories = [
@@ -17,7 +18,7 @@ const categories = [
   { id: "irregular", label: "Verbes irréguliers", description: "esse, ire, ferre, velle..." },
 ]
 
-export function VerbCategorySelect({ studentName, onSubmit }: VerbCategorySelectProps) {
+export function VerbCategorySelect({ studentName, onSubmit, onBack }: VerbCategorySelectProps) {
   const [selected, setSelected] = useState<Set<string>>(new Set(categories.map((c) => c.id)))
 
   const toggleCategory = (id: string) => {
@@ -98,7 +99,16 @@ export function VerbCategorySelect({ studentName, onSubmit }: VerbCategorySelect
         ))}
       </div>
 
-      <div className="flex justify-center pt-2">
+      <div className="flex justify-center gap-3 pt-2">
+        {onBack && (
+          <button 
+            type="button" 
+            onClick={onBack}
+            className="rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+          >
+            Retour
+          </button>
+        )}
         <button type="submit" className="pill-glow">
           Continuer
         </button>

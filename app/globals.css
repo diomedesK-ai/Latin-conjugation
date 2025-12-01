@@ -219,6 +219,159 @@
   animation: fade-in 0.5s ease-out forwards;
 }
 
+/* Apple Intelligence Multi-Color Gradient Border */
+.rainbow-glow-selected {
+  position: relative;
+  border: 2px solid transparent;
+  background: 
+    linear-gradient(white, white) padding-box,
+    linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.7) 0%,      /* Blue */
+      rgba(34, 197, 94, 0.7) 25%,      /* Green */
+      rgba(239, 68, 68, 0.7) 50%,      /* Red */
+      rgba(217, 70, 239, 0.7) 75%,     /* Fuchsia */
+      rgba(139, 92, 246, 0.7) 100%    /* Purple */
+    ) border-box;
+  box-shadow: 
+    0 0 12px rgba(59, 130, 246, 0.15),
+    0 0 12px rgba(34, 197, 94, 0.12),
+    0 0 12px rgba(239, 68, 68, 0.12),
+    0 0 12px rgba(217, 70, 239, 0.12);
+}
+
+.dark .rainbow-glow-selected {
+  background: 
+    linear-gradient(#000, #000) padding-box,
+    linear-gradient(135deg, 
+      #3b82f6 0%,
+      #22c55e 25%,
+      #ef4444 50%,
+      #d946ef 75%,
+      #8b5cf6 100%
+    ) border-box;
+}
+
+/* Dark/Black background variant for Perfectum */
+.rainbow-glow-selected-dark {
+  position: relative;
+  border: 2px solid transparent;
+  background: 
+    linear-gradient(#000, #000) padding-box,
+    linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.7) 0%,
+      rgba(34, 197, 94, 0.7) 25%,
+      rgba(239, 68, 68, 0.7) 50%,
+      rgba(217, 70, 239, 0.7) 75%,
+      rgba(139, 92, 246, 0.7) 100%
+    ) border-box;
+  box-shadow: 
+    0 0 12px rgba(59, 130, 246, 0.18),
+    0 0 12px rgba(34, 197, 94, 0.15),
+    0 0 12px rgba(239, 68, 68, 0.15),
+    0 0 12px rgba(217, 70, 239, 0.15);
+}
+
+.rainbow-glow-selected-subtle {
+  position: relative;
+  border: 2px solid transparent;
+  background: 
+    linear-gradient(white, white) padding-box,
+    linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.6) 0%,
+      rgba(34, 197, 94, 0.6) 25%,
+      rgba(239, 68, 68, 0.6) 50%,
+      rgba(217, 70, 239, 0.6) 75%,
+      rgba(139, 92, 246, 0.6) 100%
+    ) border-box;
+  box-shadow: 
+    0 0 12px rgba(59, 130, 246, 0.18),
+    0 0 12px rgba(34, 197, 94, 0.15),
+    0 0 12px rgba(239, 68, 68, 0.15),
+    0 0 12px rgba(217, 70, 239, 0.15);
+}
+
+.dark .rainbow-glow-selected-subtle {
+  background: 
+    linear-gradient(#111, #111) padding-box,
+    linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.6) 0%,
+      rgba(34, 197, 94, 0.6) 25%,
+      rgba(239, 68, 68, 0.6) 50%,
+      rgba(217, 70, 239, 0.6) 75%,
+      rgba(139, 92, 246, 0.6) 100%
+    ) border-box;
+}
+
+/* Dark background subtle variant */
+.rainbow-glow-selected-subtle-dark {
+  position: relative;
+  border: 2px solid transparent;
+  background: 
+    linear-gradient(#111, #111) padding-box,
+    linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.7) 0%,
+      rgba(34, 197, 94, 0.7) 25%,
+      rgba(239, 68, 68, 0.7) 50%,
+      rgba(217, 70, 239, 0.7) 75%,
+      rgba(139, 92, 246, 0.7) 100%
+    ) border-box;
+  box-shadow: 
+    0 0 12px rgba(59, 130, 246, 0.2),
+    0 0 12px rgba(34, 197, 94, 0.18),
+    0 0 12px rgba(239, 68, 68, 0.18),
+    0 0 12px rgba(217, 70, 239, 0.18);
+}
+
+/* Indicator dot styles */
+.indicator-dot {
+  @apply w-3 h-3 rounded-full transition-all duration-300;
+}
+
+.indicator-dot-infectum {
+  background: linear-gradient(135deg, 
+    #3b82f6 0%,
+    #22c55e 25%,
+    #ef4444 50%,
+    #d946ef 75%,
+    #8b5cf6 100%
+  );
+  box-shadow: 
+    0 0 4px rgba(59, 130, 246, 0.4),
+    0 0 4px rgba(34, 197, 94, 0.3),
+    0 0 4px rgba(239, 68, 68, 0.3),
+    0 0 4px rgba(217, 70, 239, 0.3);
+}
+
+.indicator-dot-perfectum {
+  background: linear-gradient(135deg, 
+    #3b82f6 0%,
+    #22c55e 25%,
+    #ef4444 50%,
+    #d946ef 75%,
+    #8b5cf6 100%
+  );
+  box-shadow: 
+    0 0 6px rgba(59, 130, 246, 0.5),
+    0 0 6px rgba(34, 197, 94, 0.4),
+    0 0 6px rgba(239, 68, 68, 0.4),
+    0 0 6px rgba(217, 70, 239, 0.4);
+}
+
+/* Small rainbow dot for tense selection */
+.rainbow-dot {
+  background: linear-gradient(135deg, 
+    #3b82f6 0%,
+    #22c55e 25%,
+    #ef4444 50%,
+    #d946ef 75%,
+    #8b5cf6 100%
+  );
+  box-shadow: 
+    0 0 3px rgba(59, 130, 246, 0.4),
+    0 0 3px rgba(217, 70, 239, 0.3);
+}
+
+
 @media (max-width: 768px) {
   .poem-line {
     font-size: 1.25rem;
