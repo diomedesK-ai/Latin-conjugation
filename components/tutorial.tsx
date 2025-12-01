@@ -6,7 +6,16 @@ type TutorialProps = {
   onComplete: () => void
 }
 
-const steps = [
+type TutorialStep = {
+  title: string
+  description: string
+  example?: {
+    verb: string
+    answer: string
+  }
+}
+
+const steps: TutorialStep[] = [
   {
     title: "Bienvenue",
     description: "Apprenez la conjugaison latine de manière interactive et personnalisée",
@@ -22,6 +31,10 @@ const steps = [
   {
     title: "Conjuguez",
     description: "Pratiquez les 6 formes du présent de l'indicatif",
+    example: {
+      verb: "moneo, mones, monere (avertir, conseiller)",
+      answer: "moneo, mones, monet, monemus, monetis, monent"
+    }
   },
   {
     title: "Progressez",
@@ -160,6 +173,19 @@ export function Tutorial({ onComplete }: TutorialProps) {
             <h2 className="text-4xl font-semibold text-foreground">{step.title}</h2>
             <p className="text-lg text-muted-foreground leading-relaxed">{step.description}</p>
           </div>
+
+          {step.example && (
+            <div className="rounded-2xl border border-border/50 bg-card/50 p-6 shadow-sm text-left">
+              <p className="mb-3 text-sm font-medium text-foreground">Exemple :</p>
+              <p className="text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">{step.example.verb}</span>
+              </p>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Réponse attendue :{" "}
+                <span className="font-medium text-foreground">{step.example.answer}</span>
+              </p>
+            </div>
+          )}
 
           <div className="flex justify-center gap-2 pt-4">
             {steps.map((_, index) => (

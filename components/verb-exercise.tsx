@@ -229,7 +229,7 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
                 <input
                   value={answers.singular1}
                   onChange={(e) => setAnswers((prev) => ({ ...prev, singular1: e.target.value }))}
-                  placeholder="ex: moneo"
+                  placeholder=""
                   disabled={showNext && verificationMode === "per-step"}
                   className="pill-input w-full"
                   autoFocus
@@ -240,7 +240,7 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
                 <input
                   value={answers.singular2}
                   onChange={(e) => setAnswers((prev) => ({ ...prev, singular2: e.target.value }))}
-                  placeholder="ex: mones"
+                  placeholder=""
                   disabled={showNext && verificationMode === "per-step"}
                   className="pill-input w-full"
                 />
@@ -250,7 +250,7 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
                 <input
                   value={answers.singular3}
                   onChange={(e) => setAnswers((prev) => ({ ...prev, singular3: e.target.value }))}
-                  placeholder="ex: monet"
+                  placeholder=""
                   disabled={showNext && verificationMode === "per-step"}
                   className="pill-input w-full"
                 />
@@ -265,7 +265,7 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
                 <input
                   value={answers.plural1}
                   onChange={(e) => setAnswers((prev) => ({ ...prev, plural1: e.target.value }))}
-                  placeholder="ex: monemus"
+                  placeholder=""
                   disabled={showNext && verificationMode === "per-step"}
                   className="pill-input w-full"
                 />
@@ -275,7 +275,7 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
                 <input
                   value={answers.plural2}
                   onChange={(e) => setAnswers((prev) => ({ ...prev, plural2: e.target.value }))}
-                  placeholder="ex: monetis"
+                  placeholder=""
                   disabled={showNext && verificationMode === "per-step"}
                   className="pill-input w-full"
                 />
@@ -285,7 +285,7 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
                 <input
                   value={answers.plural3}
                   onChange={(e) => setAnswers((prev) => ({ ...prev, plural3: e.target.value }))}
-                  placeholder="ex: monent"
+                  placeholder=""
                   disabled={showNext && verificationMode === "per-step"}
                   className="pill-input w-full"
                 />

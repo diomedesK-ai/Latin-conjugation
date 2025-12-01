@@ -17,8 +17,8 @@ export function VerbCountSelect({ studentName, onSubmit }: VerbCountSelectProps)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const numCount = Number.parseInt(count, 10)
-    if (isNaN(numCount) || numCount < 10) {
-      setError("Minimum : 10 verbes")
+    if (isNaN(numCount) || numCount < 1) {
+      setError("Minimum : 1 verbe")
       return
     }
     if (numCount > 50) {
@@ -34,17 +34,6 @@ export function VerbCountSelect({ studentName, onSubmit }: VerbCountSelectProps)
         Bienvenue, <span className="font-semibold">{studentName}</span> !
       </p>
 
-      <div className="rounded-2xl border border-border/50 bg-card/50 p-6 shadow-sm">
-        <p className="mb-3 text-sm font-medium text-foreground">Exemple :</p>
-        <p className="text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">moneo, mones, monere</span> (avertir, conseiller)
-        </p>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Réponse attendue :{" "}
-          <span className="font-medium text-foreground">moneo, mones, monet, monemus, monetis, monent</span>
-        </p>
-      </div>
-
       <div className="space-y-3">
         <label htmlFor="count" className="block text-sm font-medium text-foreground">
           Combien de verbes souhaitez-vous pratiquer ?
@@ -52,7 +41,7 @@ export function VerbCountSelect({ studentName, onSubmit }: VerbCountSelectProps)
         <input
           id="count"
           type="number"
-          min={10}
+          min={1}
           max={50}
           value={count}
           onChange={(e) => {
@@ -62,7 +51,7 @@ export function VerbCountSelect({ studentName, onSubmit }: VerbCountSelectProps)
           className="pill-input w-full text-base"
           autoFocus
         />
-        <p className="text-sm text-muted-foreground">Minimum : 10, Maximum : 50</p>
+        <p className="text-sm text-muted-foreground">Minimum : 1, Maximum : 50</p>
         {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       </div>
 
