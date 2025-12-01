@@ -11,41 +11,36 @@ export async function POST(request: Request) {
 
     const result = await streamText({
       model: openai("gpt-5.1"),
-      prompt: `Tu es un poète francophone expert et professeur de latin. Écris EXACTEMENT 4 lignes de poème pour un élève nommé "${studentName}".
+      system: `Tu es un assistant qui génère des poèmes au format strict. Tu dois TOUJOURS respecter EXACTEMENT le format demandé sans aucune déviation.`,
+      prompt: `Génère un poème de 4 lignes pour l'élève "${studentName}".
 
-FORMAT OBLIGATOIRE (à suivre EXACTEMENT):
-Ligne 1: [FR] suivi d'UNE phrase en français avec le prénom ${studentName}
-Ligne 2: [FR] suivi d'UNE phrase en français
-Ligne 3: [LA] suivi de la traduction latine de la ligne 1
-Ligne 4: [LA] suivi de la traduction latine de la ligne 2
+FORMAT STRICT - COPIE CET EXEMPLE EN ADAPTANT POUR ${studentName}:
 
-RÈGLES CRITIQUES:
-1. Commence directement avec [FR] - PAS d'introduction
-2. EXACTEMENT 4 lignes, PAS PLUS, PAS MOINS
-3. Chaque ligne commence par [FR] ou [LA] suivi d'UN ESPACE puis le texte
-4. D'ABORD les 2 lignes [FR], PUIS les 2 lignes [LA]
-5. UNE SEULE phrase par ligne
-6. JAMAIS de texte avant ou après les 4 lignes
-7. JAMAIS de répétitions ou duplications
-8. Français grammaticalement parfait (accords, conjugaisons)
-9. Latin correct niveau débutant
-10. Ton positif et encourageant pour enfants
-11. PAS d'emojis, PAS de guillemets, PAS de tags supplémentaires
-
-EXEMPLE EXACT (suis ce format précisément):
-[FR] Marie, ton cœur s'ouvre à la langue des anciens
+[FR] ${studentName}, ton cœur s'ouvre à la langue des anciens
 [FR] Chaque mot latin fait grandir ta lumière
-[LA] Maria, cor tuum linguae antiquorum aperitur
+[LA] ${studentName}, cor tuum linguae antiquorum aperitur
 [LA] Quodlibet verbum Latinum lucem tuam crescere facit
 
-GÉNÈRE MAINTENANT EXACTEMENT 4 LIGNES pour ${studentName}:`,
+RÈGLES ABSOLUES:
+1. Écris EXACTEMENT 4 lignes, ni plus ni moins
+2. Ligne 1 commence par [FR] espace puis une phrase française avec le prénom ${studentName}
+3. Ligne 2 commence par [FR] espace puis une phrase française
+4. Ligne 3 commence par [LA] espace puis traduction latine ligne 1
+5. Ligne 4 commence par [LA] espace puis traduction latine ligne 2
+6. JAMAIS mélanger français et latin dans une même ligne
+7. Chaque ligne [LA] doit être SEULEMENT en latin, AUCUN mot français
+8. Français grammaticalement parfait
+9. Ton positif et encourageant
+10. PAS de texte avant, après, ou entre les lignes
+
+Génère maintenant le poème:`,
     })
 
     return result.toTextStreamResponse()
   } catch (error) {
     console.error("Poem generation error:", error)
     return new Response(
-      `[FR] Bienvenue ${(await request.json()).studentName || "cher élève"}, dans ce voyage enchanté\n[LA] Salve in hoc itinere magnifico\n[FR] Le latin t'ouvre ses portes dorées\n[LA] Lingua Latina portas tibi aperit`,
+      `[FR] Bienvenue ${(await request.json()).studentName || "cher élève"}, dans ce voyage enchanté\n[FR] Le latin t'ouvre ses portes dorées\n[LA] Salve in hoc itinere magnifico\n[LA] Lingua Latina portas tibi aperit`,
       { headers: { "Content-Type": "text/plain" } }
     )
   }
