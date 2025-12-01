@@ -6,6 +6,7 @@ export type LatinVerb = {
   conjugation: 1 | 2 | 3 | 4 | "irregular"
   presentConjugation: [string, string, string, string, string, string]
   isCompound?: boolean
+  category?: string
 }
 
 export const LATIN_VERBS: LatinVerb[] = [

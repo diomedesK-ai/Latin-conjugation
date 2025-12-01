@@ -11,31 +11,34 @@ export async function POST(request: Request) {
 
     const result = await streamText({
       model: openai("gpt-5.1"),
-      prompt: `Tu es un poète francophone expert et professeur de latin. Écris un très court poème personnalisé (4 lignes) pour un élève nommé "${studentName}" qui commence son apprentissage du latin.
+      prompt: `Tu es un poète francophone expert et professeur de latin. Écris EXACTEMENT 4 lignes de poème pour un élève nommé "${studentName}".
 
-FORMAT STRICT - TOUT le français D'ABORD, puis TOUT le latin:
-[FR] Première phrase complète en français GRAMMATICALEMENT PARFAIT avec le prénom ${studentName}
-[FR] Deuxième phrase complète en français GRAMMATICALEMENT PARFAIT
-[LA] Traduction latine complète de la première phrase française
-[LA] Traduction latine complète de la deuxième phrase française
+FORMAT OBLIGATOIRE (à suivre EXACTEMENT):
+Ligne 1: [FR] suivi d'UNE phrase en français avec le prénom ${studentName}
+Ligne 2: [FR] suivi d'UNE phrase en français
+Ligne 3: [LA] suivi de la traduction latine de la ligne 1
+Ligne 4: [LA] suivi de la traduction latine de la ligne 2
 
-RÈGLES ABSOLUES:
-- Exactement 4 lignes (2 FR puis 2 LA)
-- D'ABORD les 2 lignes françaises [FR]
-- ENSUITE les 2 lignes latines [LA]
-- JAMAIS alterner FR/LA/FR/LA
-- Les lignes [FR] contiennent SEULEMENT du français grammaticalement correct (pas de fautes!)
-- Les lignes [LA] contiennent SEULEMENT du latin correct
-- Vérifie l'accord des adjectifs, conjugaisons, et syntaxe française
-- Positif, encourageant, poétique, adapté aux enfants
-- Pas d'emojis, pas de guillemets
-- Commence directement avec [FR]
+RÈGLES CRITIQUES:
+1. Commence directement avec [FR] - PAS d'introduction
+2. EXACTEMENT 4 lignes, PAS PLUS, PAS MOINS
+3. Chaque ligne commence par [FR] ou [LA] suivi d'UN ESPACE puis le texte
+4. D'ABORD les 2 lignes [FR], PUIS les 2 lignes [LA]
+5. UNE SEULE phrase par ligne
+6. JAMAIS de texte avant ou après les 4 lignes
+7. JAMAIS de répétitions ou duplications
+8. Français grammaticalement parfait (accords, conjugaisons)
+9. Latin correct niveau débutant
+10. Ton positif et encourageant pour enfants
+11. PAS d'emojis, PAS de guillemets, PAS de tags supplémentaires
 
-EXEMPLE DU BON FORMAT:
+EXEMPLE EXACT (suis ce format précisément):
 [FR] Marie, ton cœur s'ouvre à la langue des anciens
 [FR] Chaque mot latin fait grandir ta lumière
 [LA] Maria, cor tuum linguae antiquorum aperitur
-[LA] Quodlibet verbum Latinum lucem tuam crescere facit`,
+[LA] Quodlibet verbum Latinum lucem tuam crescere facit
+
+GÉNÈRE MAINTENANT EXACTEMENT 4 LIGNES pour ${studentName}:`,
     })
 
     return result.toTextStreamResponse()

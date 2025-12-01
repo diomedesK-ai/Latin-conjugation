@@ -150,22 +150,106 @@ export function Results({ studentName, results, timeInSeconds, history, onRestar
     <div className="space-y-8">
       {showConfetti && percentage >= 60 && <Confetti />}
 
-      <div className="space-y-4 text-center">
-        <div className="space-y-2">
-          <p className="text-5xl font-bold text-foreground">
-            {correctCount}
-            <span className="text-2xl text-muted-foreground">/{results.length}</span>
-          </p>
-          <p className="text-lg text-muted-foreground">{percentage}% de réussite</p>
-        </div>
+      {/* Badge-style congratulations */}
+      <div className="relative mx-auto max-w-2xl">
+        <div className="result-badge">
+          <div className="space-y-4 text-center">
+            {/* Student name with checkmark for 100% */}
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Bravo</p>
+              <div className="flex items-center justify-center gap-3">
+                <h2 className="text-4xl font-bold text-foreground">{studentName}</h2>
+                {percentage === 100 && (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-green-500">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="rgb(34, 197, 94)"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+            </div>
 
-        {isLoadingMessage ? (
-          <div className="mx-auto h-4 w-4 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground" />
-        ) : (
-          <div className="mx-auto max-w-lg rounded-2xl border border-border/50 bg-card/50 p-6">
-            <p className="text-foreground leading-relaxed">{congratsMessage}</p>
+            {/* Score and time - elegant and minimal */}
+            <div className="space-y-2">
+              <div className="text-6xl font-light text-foreground tracking-tight score-glow">
+                {percentage}%
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {correctCount}/{results.length} · {formatTime(timeInSeconds)}
+              </p>
+            </div>
+
+            {/* Category badges */}
+            {results.some(r => r.category) && (
+              <div className="flex flex-wrap justify-center gap-2 pt-2">
+                {Array.from(new Set(results.map(r => r.category).filter(Boolean))).map((category) => {
+                  const categoryLabels: Record<string, string> = {
+                    "1": "1ère conj.",
+                    "2": "2ème conj.",
+                    "3": "3ème conj.",
+                    "3-io": "3ème mixte",
+                    "4": "4ème conj.",
+                    "compound": "Composés",
+                    "irregular": "Irréguliers"
+                  }
+                  return (
+                    <span
+                      key={category}
+                      className="inline-flex items-center rounded-full bg-black text-white px-3 py-1 text-xs font-medium shadow-[0_2px_10px_rgba(0,0,0,0.3)] dark:bg-white dark:text-black dark:shadow-[0_2px_10px_rgba(255,255,255,0.3)]"
+                    >
+                      {categoryLabels[category || ""] || category}
+                    </span>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* AI-generated congratulations message */}
+            {isLoadingMessage ? (
+              <div className="mx-auto h-4 w-4 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground" />
+            ) : (
+              <div className="pt-4">
+                <p className="text-base text-foreground/90 leading-relaxed max-w-xl mx-auto">
+                  {congratsMessage?.split(/(\d+\s*%)|(\b[A-ZÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ][a-zàâäéèêëïîôùûüÿç]+\b)/g).map((part, index) => {
+                    if (!part) return null
+                    // Check if it's a percentage
+                    if (/\d+\s*%/.test(part)) {
+                      return (
+                        <span 
+                          key={index} 
+                          className="inline-flex items-center rounded-full bg-green-500/10 px-2.5 py-0.5 text-sm font-semibold text-green-600 dark:bg-green-500/20 dark:text-green-400 mx-1"
+                        >
+                          {part}
+                        </span>
+                      )
+                    }
+                    // Check if it's the student name
+                    if (part === studentName) {
+                      return (
+                        <span 
+                          key={index} 
+                          className="inline-flex items-center rounded-full bg-foreground/10 px-2.5 py-0.5 text-sm font-semibold text-foreground mx-1"
+                        >
+                          {part}
+                        </span>
+                      )
+                    }
+                    return <span key={index}>{part}</span>
+                  })}
+                </p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
@@ -187,7 +271,9 @@ export function Results({ studentName, results, timeInSeconds, history, onRestar
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium text-foreground">Tableau des performances</h3>
-            <span className="text-xs text-muted-foreground">{history.length} sessions</span>
+            <span className="inline-flex items-center rounded-full bg-black text-white px-2.5 py-0.5 text-xs font-medium shadow-[0_2px_10px_rgba(0,0,0,0.3)] dark:bg-white dark:text-black dark:shadow-[0_2px_10px_rgba(255,255,255,0.3)]">
+              {history.length} sessions
+            </span>
           </div>
           <div className="space-y-2">
             {sortedHistory.slice(0, 5).map((session, index) => (
@@ -207,7 +293,20 @@ export function Results({ studentName, results, timeInSeconds, history, onRestar
         {results.map((result, index) => (
           <div key={index} className="rounded-2xl border border-border/50 bg-card/50 p-4 shadow-sm">
             <div className="mb-3 flex items-start justify-between">
-              <p className="font-medium text-foreground">{result.principalParts}</p>
+              <div className="flex items-center gap-2">
+                <p className="font-medium text-foreground">{result.principalParts}</p>
+                {result.category && (
+                  <span className="text-xs text-muted-foreground">
+                    ({(() => {
+                      const labels: Record<string, string> = {
+                        "1": "1ère", "2": "2ème", "3": "3ème", "3-io": "3ème mixte",
+                        "4": "4ème", "compound": "composé", "irregular": "irr."
+                      }
+                      return labels[result.category] || result.category
+                    })()})
+                  </span>
+                )}
+              </div>
               {result.isCorrect ? (
                 <svg
                   width="24"

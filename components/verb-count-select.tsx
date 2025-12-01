@@ -61,29 +61,29 @@ export function VerbCountSelect({ studentName, onSubmit }: VerbCountSelectProps)
           <button
             type="button"
             onClick={() => setMode("per-step")}
-            className={`rounded-2xl border px-4 py-4 text-sm transition-all duration-200 ${
+            className={`rounded-full px-5 py-4 text-sm transition-all duration-300 ${
               mode === "per-step"
-                ? "border-foreground/30 bg-foreground/5 font-medium text-foreground shadow-md"
-                : "border-border/50 bg-transparent text-muted-foreground hover:border-foreground/20 hover:bg-foreground/[0.02]"
+                ? "bg-white text-black shadow-[0_3px_15px_rgba(0,0,0,0.15)] dark:bg-white dark:text-black dark:shadow-[0_3px_15px_rgba(255,255,255,0.2)] scale-[1.02]"
+                : "bg-background/50 text-muted-foreground border border-border/60 hover:bg-background/80 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_2px_10px_rgba(255,255,255,0.08)]"
             }`}
           >
             <div className="text-left">
-              <div className="font-medium">Par étape</div>
-              <div className="mt-1 text-xs opacity-70 leading-relaxed">Feedback immédiat après chaque verbe</div>
+              <div className={`font-medium ${mode === "per-step" ? "text-black" : "text-muted-foreground/50"}`}>Par étape</div>
+              <div className={`mt-1 text-xs leading-relaxed ${mode === "per-step" ? "text-black/70" : "text-muted-foreground/50"}`}>Feedback immédiat après chaque verbe</div>
             </div>
           </button>
           <button
             type="button"
             onClick={() => setMode("at-end")}
-            className={`rounded-2xl border px-4 py-4 text-sm transition-all duration-200 ${
+            className={`rounded-full px-5 py-4 text-sm transition-all duration-300 ${
               mode === "at-end"
-                ? "border-foreground/30 bg-foreground/5 font-medium text-foreground shadow-md"
-                : "border-border/50 bg-transparent text-muted-foreground hover:border-foreground/20 hover:bg-foreground/[0.02]"
+                ? "bg-white text-black shadow-[0_3px_15px_rgba(0,0,0,0.15)] dark:bg-white dark:text-black dark:shadow-[0_3px_15px_rgba(255,255,255,0.2)] scale-[1.02]"
+                : "bg-background/50 text-muted-foreground border border-border/60 hover:bg-background/80 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_2px_10px_rgba(255,255,255,0.08)]"
             }`}
           >
             <div className="text-left">
-              <div className="font-medium">À la fin</div>
-              <div className="mt-1 text-xs opacity-70 leading-relaxed">Résultats complets en une seule fois</div>
+              <div className={`font-medium ${mode === "at-end" ? "text-black" : "text-muted-foreground/50"}`}>À la fin</div>
+              <div className={`mt-1 text-xs leading-relaxed ${mode === "at-end" ? "text-black/70" : "text-muted-foreground/50"}`}>Résultats complets en une seule fois</div>
             </div>
           </button>
         </div>

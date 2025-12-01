@@ -55,13 +55,19 @@ export function PoemDisplay({ studentName, onComplete }: PoemDisplayProps) {
   }, [studentName])
 
   const renderPoem = () => {
+    if (!isComplete) return null // Only show when complete to avoid fragments
+    
     // Clean up the text and extract only complete, valid lines
-    const cleanText = streamedText.replace(/\[FR\]/gi, "\n[FR]").replace(/\[LA\]/gi, "\n[LA]")
+    const cleanText = streamedText
+      .replace(/\[FR\]/gi, "\n[FR]")
+      .replace(/\[LA\]/gi, "\n[LA]")
+      .replace(/\n+/g, "\n") // Remove duplicate newlines
+    
     const lines = cleanText.split("\n").filter((line) => line.trim())
     
-    const seenLines = new Set<string>()
     const frenchLines: string[] = []
     const latinLines: string[] = []
+    const seenContent = new Set<string>()
     
     lines.forEach((line) => {
       // Match [FR] or [LA] at the start, capture everything after
@@ -69,34 +75,41 @@ export function PoemDisplay({ studentName, onComplete }: PoemDisplayProps) {
       const laMatch = line.match(/^\[LA\]\s*(.+)$/i)
 
       if (frMatch) {
-        let text = frMatch[1].trim()
-        // Remove any stray bracket fragments like [desFR] or incomplete tags
-        text = text.replace(/\[\s*\w*FR\s*\]/gi, '').replace(/\[\s*\w*LA\s*\]/gi, '').trim()
-        // Only show lines with at least 10 characters and no remaining brackets
-        if (text.length >= 10 && !text.includes('[') && !text.includes(']') && !seenLines.has(`fr:${text}`)) {
-          seenLines.add(`fr:${text}`)
+        let text = frMatch[1]
+          .trim()
+          .replace(/\[.*?\]/g, '') // Remove any bracket tags
+          .replace(/\s+/g, ' ') // Normalize spaces
+          .trim()
+        
+        // Only show lines with at least 15 characters and not seen before
+        if (text.length >= 15 && !seenContent.has(text.toLowerCase())) {
+          seenContent.add(text.toLowerCase())
           frenchLines.push(text)
         }
       } else if (laMatch) {
-        let text = laMatch[1].trim()
-        // Remove any stray bracket fragments
-        text = text.replace(/\[\s*\w*FR\s*\]/gi, '').replace(/\[\s*\w*LA\s*\]/gi, '').trim()
-        // Only show lines with at least 10 characters and no remaining brackets
-        if (text.length >= 10 && !text.includes('[') && !text.includes(']') && !seenLines.has(`la:${text}`)) {
-          seenLines.add(`la:${text}`)
+        let text = laMatch[1]
+          .trim()
+          .replace(/\[.*?\]/g, '') // Remove any bracket tags
+          .replace(/\s+/g, ' ') // Normalize spaces
+          .trim()
+        
+        // Only show lines with at least 15 characters and not seen before
+        if (text.length >= 15 && !seenContent.has(text.toLowerCase())) {
+          seenContent.add(text.toLowerCase())
           latinLines.push(text)
         }
       }
     })
     
+    // Limit to 2 French and 2 Latin lines
     return (
       <>
-        {frenchLines.map((line, index) => (
+        {frenchLines.slice(0, 2).map((line, index) => (
           <p key={`fr-${index}`} className="poem-line poem-french">
             {line}
           </p>
         ))}
-        {latinLines.map((line, index) => (
+        {latinLines.slice(0, 2).map((line, index) => (
           <p key={`la-${index}`} className="poem-line poem-latin">
             {line}
           </p>

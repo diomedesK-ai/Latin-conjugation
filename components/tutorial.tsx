@@ -42,88 +42,9 @@ const steps: TutorialStep[] = [
   },
 ]
 
-function TutorialCelebration() {
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    setTimeout(() => setIsVisible(true), 200)
-  }, [])
-
-  // Path coordinates from the article: https://thisdevbrain.com/apple-hello-animation/
-  // Converted from SwiftUI normalized coordinates to SVG
-  return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black">
-      <div className={`transition-opacity duration-500 ${isVisible ? "opacity-100" : "opacity-0"}`} style={{ width: '70%', maxWidth: '600px' }}>
-        <svg
-          viewBox="0 0 1000 900"
-          xmlns="http://www.w3.org/2000/svg"
-          className="apple-hello-svg"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          <defs>
-            <linearGradient id="appleGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#22c55e" />
-              <stop offset="15%" stopColor="#eab308" />
-              <stop offset="30%" stopColor="#f97316" />
-              <stop offset="45%" stopColor="#ef4444" />
-              <stop offset="60%" stopColor="#ec4899" />
-              <stop offset="75%" stopColor="#a855f7" />
-              <stop offset="90%" stopColor="#3b82f6" />
-              <stop offset="100%" stopColor="#6366f1" />
-            </linearGradient>
-          </defs>
-
-          {/* Apple's "hello" path - from the article */}
-          <path
-            d="M 189.42 649.16
-               C 274.18 516.69 238.09 593.94 274.18 516.69
-               C 301.96 457.22 316.51 377.24 305.36 342.81
-               C 264.79 217.53 240.62 674.07 246.51 674.14
-               C 252.4 674.2 252.06 541.25 281.92 511.1
-               C 311.78 480.94 322.3 521.11 323.67 539.84
-               C 325.89 570.11 316.87 618.04 318.39 635.5
-               C 324.73 708.54 427.87 636.82 435.99 553.98
-               C 444.71 464.92 368.3 469.17 383.4 611.47
-               C 388.95 663.77 423.46 677.24 441.8 669.42
-               C 508.13 641.15 553.63 496.71 552.0 385.75
-               C 549.88 242.03 478.56 387.29 495.71 608.64
-               C 502.32 693.93 558.41 666.19 574.99 643.51
-               C 605.64 601.57 659.66 480.59 649.78 363.14
-               C 639.47 240.62 561.81 442.49 597.45 626.07
-               C 609.34 687.33 645.02 666.6 654.8 657.17
-               C 678.02 634.8 685.5 553.6 704.74 518.17
-               C 729.06 473.4 767.38 506.86 768.96 560.1
-               C 772.46 677.42 721.59 677.49 702.63 651.05
-               C 686.27 628.23 682.44 560.22 704.48 518.17
-               C 719.54 489.42 743.63 488.71 775.3 520.99
-               C 788.25 534.19 799.35 531.83 808.07 510.63"
-            stroke="url(#appleGradient)"
-            strokeWidth="28"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-            className="apple-hello-path"
-          />
-        </svg>
-      </div>
-    </div>
-  )
-}
-
 export function Tutorial({ onComplete }: TutorialProps) {
-  const [showHelloAnimation, setShowHelloAnimation] = useState(true)
   const [currentStep, setCurrentStep] = useState(0)
-  const [isVisible, setIsVisible] = useState(false)
-  const [showConfetti, setShowConfetti] = useState(false)
-
-  useEffect(() => {
-    // Show hello animation for 4 seconds, then show tutorial
-    const timer = setTimeout(() => {
-      setShowHelloAnimation(false)
-      setIsVisible(true)
-    }, 4000)
-    return () => clearTimeout(timer)
-  }, [])
+  const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
     const hasSeenTutorial = localStorage.getItem("latin-tutorial-seen")
@@ -155,13 +76,7 @@ export function Tutorial({ onComplete }: TutorialProps) {
 
   const step = steps[currentStep]
 
-  // Show hello animation at the beginning
-  if (showHelloAnimation) {
-    return <TutorialCelebration />
-  }
-
   return (
-    <>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm">
         <div
           className={`w-full max-w-md space-y-8 px-6 transition-all duration-500 ${
@@ -216,7 +131,6 @@ export function Tutorial({ onComplete }: TutorialProps) {
         </div>
         </div>
       </div>
-    </>
   )
 }
 

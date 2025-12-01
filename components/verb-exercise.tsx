@@ -9,11 +9,12 @@ import type { LatinVerb } from "@/lib/latin-verbs"
 type VerbExerciseProps = {
   studentName: string
   verbCount: number
+  categories: string[]
   verificationMode: "per-step" | "at-end"
   onComplete: (results: ExerciseResult[], timeInSeconds: number) => void
 }
 
-export function VerbExercise({ studentName, verbCount, verificationMode, onComplete }: VerbExerciseProps) {
+export function VerbExercise({ studentName, verbCount, categories, verificationMode, onComplete }: VerbExerciseProps) {
   const [verbs, setVerbs] = useState<LatinVerb[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({
@@ -44,7 +45,7 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
         const response = await fetch("/api/generate-verbs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ count: verbCount, difficulty: "mixed" }),
+          body: JSON.stringify({ count: verbCount, categories, difficulty: "mixed" }),
         })
 
         if (response.ok) {
@@ -65,7 +66,7 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
     }
 
     generateVerbs()
-  }, [verbCount])
+  }, [verbCount, categories])
 
   const currentVerb = verbs[currentIndex]
 
@@ -96,6 +97,7 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
           correctAnswer,
           isCorrect: data.isCorrect,
           feedback: data.feedback,
+          category: verbToValidate.category,
         }
       } catch {
         const isCorrect =
@@ -115,6 +117,7 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
           correctAnswer,
           isCorrect,
           feedback: fallbackFeedback,
+          category: verbToValidate.category,
         }
       }
     },
@@ -151,7 +154,18 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
 
       if (incorrect.size > 0) {
         setIncorrectFields(incorrect)
-        setFeedback(`Il y a ${incorrect.size} erreur${incorrect.size > 1 ? "s" : ""}. Corrigez les champs en rouge.`)
+        
+        // Generate helpful hint without giving the answer
+        const hints = [
+          "Attention aux terminaisons du présent",
+          "Vérifie le radical du verbe",
+          "Pense à la voyelle de liaison",
+          "Rappelle-toi les terminaisons : -o, -s, -t, -mus, -tis, -nt",
+          "Vérifie la conjugaison du verbe",
+        ]
+        const randomHint = hints[Math.floor(Math.random() * hints.length)]
+        
+        setFeedback(`Il y a ${incorrect.size} erreur${incorrect.size > 1 ? "s" : ""}. ${randomHint}.`)
         setIsValidating(false)
         return
       }
@@ -368,13 +382,31 @@ export function VerbExercise({ studentName, verbCount, verificationMode, onCompl
 
         {feedback && verificationMode === "per-step" && (
           <div
-            className={`rounded-2xl p-4 ${
-              results[results.length - 1]?.isCorrect
+            className={`rounded-2xl p-4 flex items-start gap-3 ${
+              showNext
                 ? "bg-green-50 text-green-900 dark:bg-green-950/30 dark:text-green-100"
                 : "bg-red-50 text-red-900 dark:bg-red-950/30 dark:text-red-100"
             }`}
           >
-            <p className="text-sm leading-relaxed">{feedback}</p>
+            {showNext && (
+              <div className="flex-shrink-0 mt-0.5">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+              </div>
+            )}
+            <p className="text-sm leading-relaxed flex-1">{feedback}</p>
           </div>
         )}
 

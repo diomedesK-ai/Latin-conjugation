@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { NameEntry } from "@/components/name-entry"
+import { VerbCategorySelect } from "@/components/verb-category-select"
 import { VerbCountSelect } from "@/components/verb-count-select"
 import { VerbExercise } from "@/components/verb-exercise"
 import { Results } from "@/components/results"
@@ -19,6 +20,7 @@ export type ExerciseResult = {
   correctAnswer: string
   isCorrect: boolean
   feedback: string
+  category?: string
 }
 
 export type SessionHistory = {
@@ -32,8 +34,9 @@ export default function Home() {
   const [showTutorial, setShowTutorial] = useState(true)
   const [showLeaderboardModal, setShowLeaderboardModal] = useState(false)
   const [showResetModal, setShowResetModal] = useState(false)
-  const [step, setStep] = useState<"name" | "poem" | "count" | "exercise" | "results">("name")
+  const [step, setStep] = useState<"name" | "poem" | "categories" | "count" | "exercise" | "results">("name")
   const [studentName, setStudentName] = useState("")
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [verbCount, setVerbCount] = useState(10)
   const [verificationMode, setVerificationMode] = useState<"per-step" | "at-end">("per-step")
   const [results, setResults] = useState<ExerciseResult[]>([])
@@ -59,6 +62,7 @@ export default function Home() {
   const handleReset = () => {
     setStep("name")
     setStudentName("")
+    setSelectedCategories([])
     setVerbCount(10)
     setVerificationMode("per-step")
     setResults([])
@@ -71,6 +75,11 @@ export default function Home() {
   }
 
   const handlePoemComplete = () => {
+    setStep("categories")
+  }
+
+  const handleCategoriesSubmit = (categories: string[]) => {
+    setSelectedCategories(categories)
     setStep("count")
   }
 
@@ -101,6 +110,7 @@ export default function Home() {
   const handleRestart = () => {
     setStep("name")
     setStudentName("")
+    setSelectedCategories([])
     setVerbCount(10)
     setVerificationMode("per-step")
     setResults([])
@@ -138,12 +148,15 @@ export default function Home() {
 
         {step === "poem" && <PoemDisplay studentName={studentName} onComplete={handlePoemComplete} />}
 
+        {step === "categories" && <VerbCategorySelect studentName={studentName} onSubmit={handleCategoriesSubmit} />}
+
         {step === "count" && <VerbCountSelect studentName={studentName} onSubmit={handleCountSubmit} />}
 
         {step === "exercise" && (
           <VerbExercise
             studentName={studentName}
             verbCount={verbCount}
+            categories={selectedCategories}
             verificationMode={verificationMode}
             onComplete={handleExerciseComplete}
           />
