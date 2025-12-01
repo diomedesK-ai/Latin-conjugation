@@ -1,390 +1,107 @@
+// Tense system types
+export type TenseSystem = "infectum" | "perfectum"
+
+export type InfectumTense = "present" | "imperfect" | "future"
+export type PerfectumTense = "perfect" | "pluperfect" | "futurePerfect"
+
+export type LatinTense = InfectumTense | PerfectumTense
+
 export type LatinVerb = {
   firstPerson: string
   secondPerson: string
   infinitive: string
-  meaning: string // Now in French
-  conjugation: 1 | 2 | 3 | 4 | "irregular"
-  presentConjugation: [string, string, string, string, string, string]
+  perfectStem?: string // For perfectum tenses (e.g., amav- for amare)
+  supine?: string // For compound perfect tenses
+  meaning: string
+  conjugation: 1 | 2 | 3 | 4 | "irregular" | string
+  // Infectum tenses (action not completed)
+  presentConjugation?: [string, string, string, string, string, string]
   imperfectConjugation?: [string, string, string, string, string, string]
+  futureConjugation?: [string, string, string, string, string, string]
+  // Perfectum tenses (action completed)
+  perfectConjugation?: [string, string, string, string, string, string]
+  pluperfectConjugation?: [string, string, string, string, string, string]
+  futurePerfectConjugation?: [string, string, string, string, string, string]
   isCompound?: boolean
   category?: string
 }
 
-export const LATIN_VERBS: LatinVerb[] = [
-  // 1ère Conjugaison (-are)
-  {
-    firstPerson: "amo",
-    secondPerson: "amas",
-    infinitive: "amare",
-    meaning: "aimer",
-    conjugation: 1,
-    presentConjugation: ["amo", "amas", "amat", "amamus", "amatis", "amant"],
-    imperfectConjugation: ["amabam", "amabas", "amabat", "amabamus", "amabatis", "amabant"],
+// Tense metadata for UI
+export const TENSE_INFO = {
+  // Infectum - actions not completed (WHITE theme)
+  infectum: {
+    label: "Infectum",
+    description: "Actions non accomplies",
+    theme: "light" as const,
+    tenses: {
+      present: {
+        label: "Présent",
+        description: "Action actuelle",
+        example: "amo, amas, amat...",
+        endings: "-o, -s, -t, -mus, -tis, -nt"
+      },
+      imperfect: {
+        label: "Imparfait",
+        description: "Action passée continue",
+        example: "amabam, amabas, amabat...",
+        endings: "-bam, -bas, -bat, -bamus, -batis, -bant"
+      },
+      future: {
+        label: "Futur",
+        description: "Action à venir",
+        example: "amabo, amabis, amabit...",
+        endings: "-bo, -bis, -bit, -bimus, -bitis, -bunt"
+      }
+    }
   },
-  {
-    firstPerson: "laudo",
-    secondPerson: "laudas",
-    infinitive: "laudare",
-    meaning: "louer, féliciter",
-    conjugation: 1,
-    presentConjugation: ["laudo", "laudas", "laudat", "laudamus", "laudatis", "laudant"],
-    imperfectConjugation: ["laudabam", "laudabas", "laudabat", "laudabamus", "laudabatis", "laudabant"],
-  },
-  {
-    firstPerson: "paro",
-    secondPerson: "paras",
-    infinitive: "parare",
-    meaning: "préparer",
-    conjugation: 1,
-    presentConjugation: ["paro", "paras", "parat", "paramus", "paratis", "parant"],
-    imperfectConjugation: ["parabam", "parabas", "parabat", "parabamus", "parabatis", "parabant"],
-  },
-  {
-    firstPerson: "voco",
-    secondPerson: "vocas",
-    infinitive: "vocare",
-    meaning: "appeler",
-    conjugation: 1,
-    presentConjugation: ["voco", "vocas", "vocat", "vocamus", "vocatis", "vocant"],
-    imperfectConjugation: ["vocabam", "vocabas", "vocabat", "vocabamus", "vocabatis", "vocabant"],
-  },
-  {
-    firstPerson: "porto",
-    secondPerson: "portas",
-    infinitive: "portare",
-    meaning: "porter, transporter",
-    conjugation: 1,
-    presentConjugation: ["porto", "portas", "portat", "portamus", "portatis", "portant"],
-    imperfectConjugation: ["portabam", "portabas", "portabat", "portabamus", "portabatis", "portabant"],
-  },
-  {
-    firstPerson: "narro",
-    secondPerson: "narras",
-    infinitive: "narrare",
-    meaning: "raconter",
-    conjugation: 1,
-    presentConjugation: ["narro", "narras", "narrat", "narramus", "narratis", "narrant"],
-    imperfectConjugation: ["narrabam", "narrabas", "narrabat", "narrabamus", "narrabatis", "narrabant"],
-  },
-  {
-    firstPerson: "specto",
-    secondPerson: "spectas",
-    infinitive: "spectare",
-    meaning: "regarder, observer",
-    conjugation: 1,
-    presentConjugation: ["specto", "spectas", "spectat", "spectamus", "spectatis", "spectant"],
-    imperfectConjugation: ["spectabam", "spectabas", "spectabat", "spectabamus", "spectabatis", "spectabant"],
-  },
+  // Perfectum - actions completed (BLACK theme)
+  perfectum: {
+    label: "Perfectum",
+    description: "Actions accomplies",
+    theme: "dark" as const,
+    tenses: {
+      perfect: {
+        label: "Parfait",
+        description: "Action passée achevée",
+        example: "amavi, amavisti, amavit...",
+        endings: "-i, -isti, -it, -imus, -istis, -erunt"
+      },
+      pluperfect: {
+        label: "Plus-que-parfait",
+        description: "Action antérieure au passé",
+        example: "amaveram, amaveras, amaverat...",
+        endings: "-eram, -eras, -erat, -eramus, -eratis, -erant"
+      },
+      futurePerfect: {
+        label: "Futur antérieur",
+        description: "Action future achevée",
+        example: "amavero, amaveris, amaverit...",
+        endings: "-ero, -eris, -erit, -erimus, -eritis, -erint"
+      }
+    }
+  }
+}
 
-  // 2ème Conjugaison (-ere avec e long)
-  {
-    firstPerson: "moneo",
-    secondPerson: "mones",
-    infinitive: "monere",
-    meaning: "avertir, conseiller",
-    conjugation: 2,
-    presentConjugation: ["moneo", "mones", "monet", "monemus", "monetis", "monent"],
-    imperfectConjugation: ["monebam", "monebas", "monebat", "monebamus", "monebatis", "monebant"],
-  },
-  {
-    firstPerson: "habeo",
-    secondPerson: "habes",
-    infinitive: "habere",
-    meaning: "avoir, tenir",
-    conjugation: 2,
-    presentConjugation: ["habeo", "habes", "habet", "habemus", "habetis", "habent"],
-    imperfectConjugation: ["habebam", "habebas", "habebat", "habebamus", "habebatis", "habebant"],
-  },
-  {
-    firstPerson: "video",
-    secondPerson: "vides",
-    infinitive: "videre",
-    meaning: "voir",
-    conjugation: 2,
-    presentConjugation: ["video", "vides", "videt", "videmus", "videtis", "vident"],
-    imperfectConjugation: ["videbam", "videbas", "videbat", "videbamus", "videbatis", "videbant"],
-  },
-  {
-    firstPerson: "teneo",
-    secondPerson: "tenes",
-    infinitive: "tenere",
-    meaning: "tenir, garder",
-    conjugation: 2,
-    presentConjugation: ["teneo", "tenes", "tenet", "tenemus", "tenetis", "tenent"],
-    imperfectConjugation: ["tenebam", "tenebas", "tenebat", "tenebamus", "tenebatis", "tenebant"],
-  },
-  {
-    firstPerson: "doceo",
-    secondPerson: "doces",
-    infinitive: "docere",
-    meaning: "enseigner",
-    conjugation: 2,
-    presentConjugation: ["doceo", "doces", "docet", "docemus", "docetis", "docent"],
-    imperfectConjugation: ["docebam", "docebas", "docebat", "docebamus", "docebatis", "docebant"],
-  },
-  {
-    firstPerson: "moveo",
-    secondPerson: "moves",
-    infinitive: "movere",
-    meaning: "mouvoir, déplacer",
-    conjugation: 2,
-    presentConjugation: ["moveo", "moves", "movet", "movemus", "movetis", "movent"],
-    imperfectConjugation: ["movebam", "movebas", "movebat", "movebamus", "movebatis", "movebant"],
-  },
-  {
-    firstPerson: "timeo",
-    secondPerson: "times",
-    infinitive: "timere",
-    meaning: "craindre",
-    conjugation: 2,
-    presentConjugation: ["timeo", "times", "timet", "timemus", "timetis", "timent"],
-    imperfectConjugation: ["timebam", "timebas", "timebat", "timebamus", "timebatis", "timebant"],
-  },
+// Helper to get conjugation key from tense
+export function getConjugationKey(tense: LatinTense): keyof LatinVerb {
+  const map: Record<LatinTense, keyof LatinVerb> = {
+    present: "presentConjugation",
+    imperfect: "imperfectConjugation",
+    future: "futureConjugation",
+    perfect: "perfectConjugation",
+    pluperfect: "pluperfectConjugation",
+    futurePerfect: "futurePerfectConjugation"
+  }
+  return map[tense]
+}
 
-  // 3ème Conjugaison (-ere avec e bref)
-  {
-    firstPerson: "duco",
-    secondPerson: "ducis",
-    infinitive: "ducere",
-    meaning: "conduire, mener",
-    conjugation: 3,
-    presentConjugation: ["duco", "ducis", "ducit", "ducimus", "ducitis", "ducunt"],
-    imperfectConjugation: ["ducebam", "ducebas", "ducebat", "ducebamus", "ducebatis", "ducebant"],
-  },
-  {
-    firstPerson: "scribo",
-    secondPerson: "scribis",
-    infinitive: "scribere",
-    meaning: "écrire",
-    conjugation: 3,
-    presentConjugation: ["scribo", "scribis", "scribit", "scribimus", "scribitis", "scribunt"],
-    imperfectConjugation: ["scribebam", "scribebas", "scribebat", "scribebamus", "scribebatis", "scribebant"],
-  },
-  {
-    firstPerson: "lego",
-    secondPerson: "legis",
-    infinitive: "legere",
-    meaning: "lire, choisir",
-    conjugation: 3,
-    presentConjugation: ["lego", "legis", "legit", "legimus", "legitis", "legunt"],
-    imperfectConjugation: ["legebam", "legebas", "legebat", "legebamus", "legebatis", "legebant"],
-  },
-  {
-    firstPerson: "mitto",
-    secondPerson: "mittis",
-    infinitive: "mittere",
-    meaning: "envoyer",
-    conjugation: 3,
-    presentConjugation: ["mitto", "mittis", "mittit", "mittimus", "mittitis", "mittunt"],
-    imperfectConjugation: ["mittebam", "mittebas", "mittebat", "mittebamus", "mittebatis", "mittebant"],
-  },
-  {
-    firstPerson: "pono",
-    secondPerson: "ponis",
-    infinitive: "ponere",
-    meaning: "poser, placer",
-    conjugation: 3,
-    presentConjugation: ["pono", "ponis", "ponit", "ponimus", "ponitis", "ponunt"],
-    imperfectConjugation: ["ponebam", "ponebas", "ponebat", "ponebamus", "ponebatis", "ponebant"],
-  },
-  {
-    firstPerson: "dico",
-    secondPerson: "dicis",
-    infinitive: "dicere",
-    meaning: "dire, parler",
-    conjugation: 3,
-    presentConjugation: ["dico", "dicis", "dicit", "dicimus", "dicitis", "dicunt"],
-    imperfectConjugation: ["dicebam", "dicebas", "dicebat", "dicebamus", "dicebatis", "dicebant"],
-  },
-  {
-    firstPerson: "ago",
-    secondPerson: "agis",
-    infinitive: "agere",
-    meaning: "faire, agir",
-    conjugation: 3,
-    presentConjugation: ["ago", "agis", "agit", "agimus", "agitis", "agunt"],
-    imperfectConjugation: ["agebam", "agebas", "agebat", "agebamus", "agebatis", "agebant"],
-  },
-  {
-    firstPerson: "vinco",
-    secondPerson: "vincis",
-    infinitive: "vincere",
-    meaning: "vaincre",
-    conjugation: 3,
-    presentConjugation: ["vinco", "vincis", "vincit", "vincimus", "vincitis", "vincunt"],
-    imperfectConjugation: ["vincebam", "vincebas", "vincebat", "vincebamus", "vincebatis", "vincebant"],
-  },
+// Helper to get tense system from tense
+export function getTenseSystem(tense: LatinTense): TenseSystem {
+  if (tense === "present" || tense === "imperfect" || tense === "future") {
+    return "infectum"
+  }
+  return "perfectum"
+}
 
-  // 4ème Conjugaison (-ire)
-  {
-    firstPerson: "audio",
-    secondPerson: "audis",
-    infinitive: "audire",
-    meaning: "entendre, écouter",
-    conjugation: 4,
-    presentConjugation: ["audio", "audis", "audit", "audimus", "auditis", "audiunt"],
-    imperfectConjugation: ["audiebam", "audiebas", "audiebat", "audiebamus", "audiebatis", "audiebant"],
-  },
-  {
-    firstPerson: "venio",
-    secondPerson: "venis",
-    infinitive: "venire",
-    meaning: "venir",
-    conjugation: 4,
-    presentConjugation: ["venio", "venis", "venit", "venimus", "venitis", "veniunt"],
-    imperfectConjugation: ["veniebam", "veniebas", "veniebat", "veniebamus", "veniebatis", "veniebant"],
-  },
-  {
-    firstPerson: "scio",
-    secondPerson: "scis",
-    infinitive: "scire",
-    meaning: "savoir",
-    conjugation: 4,
-    presentConjugation: ["scio", "scis", "scit", "scimus", "scitis", "sciunt"],
-    imperfectConjugation: ["sciebam", "sciebas", "sciebat", "sciebamus", "sciebatis", "sciebant"],
-  },
-  {
-    firstPerson: "dormio",
-    secondPerson: "dormis",
-    infinitive: "dormire",
-    meaning: "dormir",
-    conjugation: 4,
-    presentConjugation: ["dormio", "dormis", "dormit", "dormimus", "dormitis", "dormiunt"],
-    imperfectConjugation: ["dormiebam", "dormiebas", "dormiebat", "dormiebamus", "dormiebatis", "dormiebant"],
-  },
-  {
-    firstPerson: "sentio",
-    secondPerson: "sentis",
-    infinitive: "sentire",
-    meaning: "sentir, percevoir",
-    conjugation: 4,
-    presentConjugation: ["sentio", "sentis", "sentit", "sentimus", "sentitis", "sentiunt"],
-    imperfectConjugation: ["sentiebam", "sentiebas", "sentiebat", "sentiebamus", "sentiebatis", "sentiebant"],
-  },
-
-  // Irrégulier : esse (être) et composés
-  {
-    firstPerson: "sum",
-    secondPerson: "es",
-    infinitive: "esse",
-    meaning: "être",
-    conjugation: "irregular",
-    presentConjugation: ["sum", "es", "est", "sumus", "estis", "sunt"],
-    imperfectConjugation: ["eram", "eras", "erat", "eramus", "eratis", "erant"],
-    isCompound: false,
-  },
-  {
-    firstPerson: "possum",
-    secondPerson: "potes",
-    infinitive: "posse",
-    meaning: "pouvoir",
-    conjugation: "irregular",
-    presentConjugation: ["possum", "potes", "potest", "possumus", "potestis", "possunt"],
-    imperfectConjugation: ["poteram", "poteras", "poterat", "poteramus", "poteratis", "poterant"],
-    isCompound: true,
-  },
-  {
-    firstPerson: "absum",
-    secondPerson: "abes",
-    infinitive: "abesse",
-    meaning: "être absent",
-    conjugation: "irregular",
-    presentConjugation: ["absum", "abes", "abest", "absumus", "abestis", "absunt"],
-    imperfectConjugation: ["aberam", "aberas", "aberat", "aberamus", "aberatis", "aberant"],
-    isCompound: true,
-  },
-  {
-    firstPerson: "adsum",
-    secondPerson: "ades",
-    infinitive: "adesse",
-    meaning: "être présent, assister",
-    conjugation: "irregular",
-    presentConjugation: ["adsum", "ades", "adest", "adsumus", "adestis", "adsunt"],
-    imperfectConjugation: ["aderam", "aderas", "aderat", "aderamus", "aderatis", "aderant"],
-    isCompound: true,
-  },
-  {
-    firstPerson: "prosum",
-    secondPerson: "prodes",
-    infinitive: "prodesse",
-    meaning: "être utile",
-    conjugation: "irregular",
-    presentConjugation: ["prosum", "prodes", "prodest", "prosumus", "prodestis", "prosunt"],
-    imperfectConjugation: ["proderam", "proderas", "proderat", "proderamus", "proderatis", "proderant"],
-    isCompound: true,
-  },
-
-  // Autres verbes courants
-  {
-    firstPerson: "facio",
-    secondPerson: "facis",
-    infinitive: "facere",
-    meaning: "faire, fabriquer",
-    conjugation: 3,
-    presentConjugation: ["facio", "facis", "facit", "facimus", "facitis", "faciunt"],
-    imperfectConjugation: ["faciebam", "faciebas", "faciebat", "faciebamus", "faciebatis", "faciebant"],
-  },
-  {
-    firstPerson: "capio",
-    secondPerson: "capis",
-    infinitive: "capere",
-    meaning: "prendre, saisir",
-    conjugation: 3,
-    presentConjugation: ["capio", "capis", "capit", "capimus", "capitis", "capiunt"],
-    imperfectConjugation: ["capiebam", "capiebas", "capiebat", "capiebamus", "capiebatis", "capiebant"],
-  },
-  {
-    firstPerson: "fugio",
-    secondPerson: "fugis",
-    infinitive: "fugere",
-    meaning: "fuir",
-    conjugation: 3,
-    presentConjugation: ["fugio", "fugis", "fugit", "fugimus", "fugitis", "fugiunt"],
-    imperfectConjugation: ["fugiebam", "fugiebas", "fugiebat", "fugiebamus", "fugiebatis", "fugiebant"],
-  },
-  {
-    firstPerson: "eo",
-    secondPerson: "is",
-    infinitive: "ire",
-    meaning: "aller",
-    conjugation: "irregular",
-    presentConjugation: ["eo", "is", "it", "imus", "itis", "eunt"],
-    imperfectConjugation: ["ibam", "ibas", "ibat", "ibamus", "ibatis", "ibant"],
-  },
-  {
-    firstPerson: "fero",
-    secondPerson: "fers",
-    infinitive: "ferre",
-    meaning: "porter, supporter",
-    conjugation: "irregular",
-    presentConjugation: ["fero", "fers", "fert", "ferimus", "fertis", "ferunt"],
-    imperfectConjugation: ["ferebam", "ferebas", "ferebat", "ferebamus", "ferebatis", "ferebant"],
-  },
-  {
-    firstPerson: "volo",
-    secondPerson: "vis",
-    infinitive: "velle",
-    meaning: "vouloir",
-    conjugation: "irregular",
-    presentConjugation: ["volo", "vis", "vult", "volumus", "vultis", "volunt"],
-    imperfectConjugation: ["volebam", "volebas", "volebat", "volebamus", "volebatis", "volebant"],
-  },
-  {
-    firstPerson: "nolo",
-    secondPerson: "non vis",
-    infinitive: "nolle",
-    meaning: "ne pas vouloir",
-    conjugation: "irregular",
-    presentConjugation: ["nolo", "non vis", "non vult", "nolumus", "non vultis", "nolunt"],
-    imperfectConjugation: ["nolebam", "nolebas", "nolebat", "nolebamus", "nolebatis", "nolebant"],
-  },
-  {
-    firstPerson: "malo",
-    secondPerson: "mavis",
-    infinitive: "malle",
-    meaning: "préférer",
-    conjugation: "irregular",
-    presentConjugation: ["malo", "mavis", "mavult", "malumus", "mavultis", "malunt"],
-    imperfectConjugation: ["malebam", "malebas", "malebat", "malebamus", "malebatis", "malebant"],
-  },
-]
+// Fallback verbs are no longer needed - all generated by LLM
+export const LATIN_VERBS: LatinVerb[] = []

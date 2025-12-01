@@ -9,44 +9,70 @@ type TutorialProps = {
 type TutorialStep = {
   title: string
   description: string
-  example?: {
-    verb: string
-    answer: string
-  }
+  content?: React.ReactNode
 }
 
 const steps: TutorialStep[] = [
   {
     title: "Bienvenue",
-    description: "Apprenez la conjugaison latine de manière interactive avec des verbes générés par IA",
+    description: "Maîtrisez la conjugaison latine avec l'Infectum et le Perfectum",
   },
   {
     title: "Entrez votre nom",
     description: "Personnalisez votre expérience d'apprentissage",
   },
   {
+    title: "Infectum ou Perfectum",
+    description: "Choisissez le système verbal à pratiquer",
+    content: (
+      <div className="grid grid-cols-2 gap-3 mt-4">
+        <div className="rounded-xl p-4 bg-white border border-gray-200 text-left">
+          <div className="font-bold text-black text-sm mb-2">Infectum</div>
+          <div className="text-[10px] text-gray-500 space-y-1">
+            <div>• Présent : amo, amas...</div>
+            <div>• Imparfait : amabam...</div>
+            <div>• Futur : amabo...</div>
+          </div>
+          <div className="text-[9px] text-gray-400 mt-2">Action non accomplie</div>
+        </div>
+        <div className="rounded-xl p-4 bg-gray-900 border border-gray-700 text-left">
+          <div className="font-bold text-white text-sm mb-2">Perfectum</div>
+          <div className="text-[10px] text-gray-400 space-y-1">
+            <div>• Parfait : amavi...</div>
+            <div>• Plus-que-parf. : amaveram...</div>
+            <div>• Futur ant. : amavero...</div>
+          </div>
+          <div className="text-[9px] text-gray-500 mt-2">Action accomplie</div>
+        </div>
+      </div>
+    )
+  },
+  {
     title: "Choisissez le temps",
-    description: "Pratiquez au présent (actions actuelles) ou à l'imparfait (actions passées continues)",
-    example: {
-      verb: "Présent → terminaisons : -o, -s, -t, -mus, -tis, -nt",
-      answer: "Imparfait → terminaisons : -bam, -bas, -bat, -bamus, -batis, -bant"
-    }
+    description: "Sélectionnez le temps précis à pratiquer dans le système choisi",
   },
   {
     title: "Sélectionnez les catégories",
-    description: "Choisissez les conjugaisons à pratiquer : 1ère, 2ème, 3ème, 4ème ou irréguliers",
+    description: "1ère, 2ème, 3ème, 4ème conjugaison ou verbes irréguliers",
   },
   {
     title: "Conjuguez",
-    description: "Pratiquez les 6 formes du temps choisi (minimum 6 verbes)",
-    example: {
-      verb: "video, vides, videre (voir) - à l'imparfait",
-      answer: "videbam, videbas, videbat, videbamus, videbatis, videbant"
-    }
+    description: "Pratiquez les 6 formes du temps choisi (minimum 1 verbe)",
+    content: (
+      <div className="rounded-xl border border-border/50 bg-card/50 p-4 mt-4 text-left">
+        <p className="text-xs font-medium text-foreground mb-2">Exemple au parfait :</p>
+        <p className="text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">video, vides, videre</span> (voir)
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Réponse : <span className="font-medium text-foreground">vidi, vidisti, vidit, vidimus, vidistis, viderunt</span>
+        </p>
+      </div>
+    )
   },
   {
     title: "Progressez",
-    description: "L'IA vous donne un feedback personnalisé et suit vos performances",
+    description: "L'IA génère des verbes et vous donne un feedback personnalisé",
   },
 ]
 
@@ -97,18 +123,7 @@ export function Tutorial({ onComplete }: TutorialProps) {
             <p className="text-lg text-muted-foreground leading-relaxed">{step.description}</p>
           </div>
 
-          {step.example && (
-            <div className="rounded-2xl border border-border/50 bg-card/50 p-6 shadow-sm text-left">
-              <p className="mb-3 text-sm font-medium text-foreground">Exemple :</p>
-              <p className="text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">{step.example.verb}</span>
-              </p>
-              <p className="mt-3 text-sm text-muted-foreground">
-                Réponse attendue :{" "}
-                <span className="font-medium text-foreground">{step.example.answer}</span>
-              </p>
-            </div>
-          )}
+          {step.content}
 
           <div className="flex justify-center gap-2 pt-4">
             {steps.map((_, index) => (
@@ -141,4 +156,3 @@ export function Tutorial({ onComplete }: TutorialProps) {
       </div>
   )
 }
-

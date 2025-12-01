@@ -13,6 +13,7 @@ import { LeaderboardModal } from "@/components/leaderboard-modal"
 import { ResetModal } from "@/components/reset-modal"
 import { PoemDisplay } from "@/components/poem-display"
 import { TenseSelect } from "@/components/tense-select"
+import type { TenseSystem, LatinTense } from "@/lib/latin-verbs"
 
 export type ExerciseResult = {
   verb: string
@@ -37,7 +38,8 @@ export default function Home() {
   const [showResetModal, setShowResetModal] = useState(false)
   const [step, setStep] = useState<"name" | "poem" | "tense" | "categories" | "count" | "exercise" | "results">("name")
   const [studentName, setStudentName] = useState("")
-  const [selectedTense, setSelectedTense] = useState<"present" | "imperfect">("present")
+  const [selectedTenseSystem, setSelectedTenseSystem] = useState<TenseSystem>("infectum")
+  const [selectedTense, setSelectedTense] = useState<LatinTense>("present")
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [verbCount, setVerbCount] = useState(10)
   const [verificationMode, setVerificationMode] = useState<"per-step" | "at-end">("per-step")
@@ -64,6 +66,7 @@ export default function Home() {
   const handleReset = () => {
     setStep("name")
     setStudentName("")
+    setSelectedTenseSystem("infectum")
     setSelectedTense("present")
     setSelectedCategories([])
     setVerbCount(10)
@@ -81,7 +84,8 @@ export default function Home() {
     setStep("tense")
   }
 
-  const handleTenseSubmit = (tense: "present" | "imperfect") => {
+  const handleTenseSubmit = (tenseSystem: TenseSystem, tense: LatinTense) => {
+    setSelectedTenseSystem(tenseSystem)
     setSelectedTense(tense)
     setStep("categories")
   }
@@ -118,6 +122,7 @@ export default function Home() {
   const handleRestart = () => {
     setStep("name")
     setStudentName("")
+    setSelectedTenseSystem("infectum")
     setSelectedTense("present")
     setSelectedCategories([])
     setVerbCount(10)
@@ -150,7 +155,7 @@ export default function Home() {
           <h1 className="mb-3 text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
             Conjugaison Latine
           </h1>
-          <p className="text-base text-muted-foreground md:text-lg">Pratiquez vos conjugaisons latines</p>
+          <p className="text-base text-muted-foreground md:text-lg">Infectum & Perfectum</p>
         </div>
 
         {step === "name" && <NameEntry onSubmit={handleNameSubmit} />}
@@ -168,6 +173,7 @@ export default function Home() {
             studentName={studentName}
             verbCount={verbCount}
             categories={selectedCategories}
+            tenseSystem={selectedTenseSystem}
             tense={selectedTense}
             verificationMode={verificationMode}
             onComplete={handleExerciseComplete}

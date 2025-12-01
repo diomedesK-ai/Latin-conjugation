@@ -17,8 +17,8 @@ export function VerbCountSelect({ studentName, onSubmit }: VerbCountSelectProps)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const numCount = Number.parseInt(count, 10)
-    if (isNaN(numCount) || numCount < 6) {
-      setError("Minimum : 6 verbes")
+    if (isNaN(numCount) || numCount < 1) {
+      setError("Minimum : 1 verbe")
       return
     }
     if (numCount > 50) {
@@ -41,7 +41,7 @@ export function VerbCountSelect({ studentName, onSubmit }: VerbCountSelectProps)
         <input
           id="count"
           type="number"
-          min={6}
+          min={1}
           max={50}
           value={count}
           onChange={(e) => {
@@ -51,7 +51,7 @@ export function VerbCountSelect({ studentName, onSubmit }: VerbCountSelectProps)
           className="pill-input w-full text-base"
           autoFocus
         />
-        <p className="text-sm text-muted-foreground">Minimum : 6, Maximum : 50</p>
+        <p className="text-sm text-muted-foreground">Minimum : 1, Maximum : 50</p>
         {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       </div>
 

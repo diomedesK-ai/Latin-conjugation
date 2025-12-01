@@ -1,85 +1,180 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
+import { TENSE_INFO, type TenseSystem, type LatinTense } from "@/lib/latin-verbs"
 
 type TenseSelectProps = {
   studentName: string
-  onSubmit: (tense: "present" | "imperfect") => void
+  onSubmit: (tenseSystem: TenseSystem, tense: LatinTense) => void
 }
 
 export function TenseSelect({ studentName, onSubmit }: TenseSelectProps) {
-  const [selectedTense, setSelectedTense] = useState<"present" | "imperfect">("present")
+  const [selectedSystem, setSelectedSystem] = useState<TenseSystem | null>(null)
+  const [selectedTense, setSelectedTense] = useState<LatinTense | null>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(selectedTense)
+    if (selectedSystem && selectedTense) {
+      onSubmit(selectedSystem, selectedTense)
+    }
+  }
+
+  const handleSystemSelect = (system: TenseSystem) => {
+    setSelectedSystem(system)
+    setSelectedTense(null) // Reset tense when system changes
+  }
+
+  const handleTenseSelect = (tense: LatinTense) => {
+    setSelectedTense(tense)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-8">
       <p className="text-lg text-foreground">
         Excellent, <span className="font-semibold">{studentName}</span> !
       </p>
 
-      <div className="space-y-3">
+      {/* Step 1: Select System (Infectum or Perfectum) */}
+      <div className="space-y-4">
         <label className="block text-sm font-medium text-foreground">
-          Quel temps souhaitez-vous pratiquer ?
+          1. Choisissez le système verbal
         </label>
         <div className="grid grid-cols-2 gap-4">
+          {/* Infectum - White/Light theme */}
           <button
             type="button"
-            onClick={() => setSelectedTense("present")}
-            className={`rounded-2xl p-5 text-left transition-all duration-300 ${
-              selectedTense === "present"
-                ? "bg-white text-black shadow-[0_4px_20px_rgba(0,0,0,0.15)] dark:bg-white dark:text-black dark:shadow-[0_4px_20px_rgba(255,255,255,0.2)] scale-[1.02]"
-                : "bg-background/50 text-muted-foreground border border-border/60 hover:bg-background/80 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_2px_10px_rgba(255,255,255,0.08)]"
+            onClick={() => handleSystemSelect("infectum")}
+            className={`rounded-2xl p-5 text-left transition-all duration-300 border-2 ${
+              selectedSystem === "infectum"
+                ? "bg-white text-black border-gray-300 shadow-[0_4px_20px_rgba(0,0,0,0.15)] scale-[1.02]"
+                : "bg-white/80 text-gray-600 border-gray-200 hover:border-gray-300 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
             }`}
           >
             <div className="space-y-2">
-              <div className={`font-semibold text-base ${selectedTense === "present" ? "text-black" : "text-foreground"}`}>
-                Présent
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-gray-200 border border-gray-300" />
+                <span className="font-bold text-lg">{TENSE_INFO.infectum.label}</span>
               </div>
-              <div className={`text-xs leading-relaxed ${selectedTense === "present" ? "text-black/70" : "text-muted-foreground"}`}>
-                Actions actuelles ou habituelles
-              </div>
-              <div className={`text-[11px] font-mono ${selectedTense === "present" ? "text-black/60" : "text-muted-foreground/70"}`}>
-                amo, amas, amat...
+              <p className="text-xs text-gray-500">{TENSE_INFO.infectum.description}</p>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {Object.entries(TENSE_INFO.infectum.tenses).map(([key, tense]) => (
+                  <span key={key} className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                    {tense.label}
+                  </span>
+                ))}
               </div>
             </div>
           </button>
 
+          {/* Perfectum - Black/Dark theme */}
           <button
             type="button"
-            onClick={() => setSelectedTense("imperfect")}
-            className={`rounded-2xl p-5 text-left transition-all duration-300 ${
-              selectedTense === "imperfect"
-                ? "bg-white text-black shadow-[0_4px_20px_rgba(0,0,0,0.15)] dark:bg-white dark:text-black dark:shadow-[0_4px_20px_rgba(255,255,255,0.2)] scale-[1.02]"
-                : "bg-background/50 text-muted-foreground border border-border/60 hover:bg-background/80 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_2px_10px_rgba(255,255,255,0.08)]"
+            onClick={() => handleSystemSelect("perfectum")}
+            className={`rounded-2xl p-5 text-left transition-all duration-300 border-2 ${
+              selectedSystem === "perfectum"
+                ? "bg-black text-white border-gray-700 shadow-[0_4px_20px_rgba(0,0,0,0.4)] scale-[1.02]"
+                : "bg-gray-900/90 text-gray-300 border-gray-700 hover:border-gray-600 hover:shadow-[0_2px_10px_rgba(0,0,0,0.3)]"
             }`}
           >
             <div className="space-y-2">
-              <div className={`font-semibold text-base ${selectedTense === "imperfect" ? "text-black" : "text-foreground"}`}>
-                Imparfait
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-gray-700 border border-gray-500" />
+                <span className="font-bold text-lg">{TENSE_INFO.perfectum.label}</span>
               </div>
-              <div className={`text-xs leading-relaxed ${selectedTense === "imperfect" ? "text-black/70" : "text-muted-foreground"}`}>
-                Actions passées continues
-              </div>
-              <div className={`text-[11px] font-mono ${selectedTense === "imperfect" ? "text-black/60" : "text-muted-foreground/70"}`}>
-                amabam, amabas, amabat...
+              <p className="text-xs text-gray-400">{TENSE_INFO.perfectum.description}</p>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {Object.entries(TENSE_INFO.perfectum.tenses).map(([key, tense]) => (
+                  <span key={key} className="text-[10px] px-2 py-0.5 rounded-full bg-gray-800 text-gray-300">
+                    {tense.label}
+                  </span>
+                ))}
               </div>
             </div>
           </button>
         </div>
       </div>
 
+      {/* Step 2: Select specific tense within the system */}
+      {selectedSystem && (
+        <div className="space-y-4 animate-fade-in">
+          <label className="block text-sm font-medium text-foreground">
+            2. Choisissez le temps
+          </label>
+          <div className="grid grid-cols-3 gap-3">
+            {Object.entries(TENSE_INFO[selectedSystem].tenses).map(([key, tense]) => {
+              const isInfectum = selectedSystem === "infectum"
+              const isSelected = selectedTense === key
+              
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => handleTenseSelect(key as LatinTense)}
+                  className={`rounded-xl p-4 text-left transition-all duration-300 border ${
+                    isInfectum
+                      ? isSelected
+                        ? "bg-white text-black border-gray-300 shadow-[0_3px_15px_rgba(0,0,0,0.12)] scale-[1.02]"
+                        : "bg-white/60 text-gray-600 border-gray-200 hover:bg-white hover:border-gray-300"
+                      : isSelected
+                        ? "bg-black text-white border-gray-600 shadow-[0_3px_15px_rgba(0,0,0,0.35)] scale-[1.02]"
+                        : "bg-gray-900/80 text-gray-300 border-gray-700 hover:bg-gray-900 hover:border-gray-600"
+                  }`}
+                >
+                  <div className="space-y-1.5">
+                    <div className={`font-semibold text-sm ${isInfectum ? "text-black" : "text-white"}`}>
+                      {tense.label}
+                    </div>
+                    <div className={`text-[10px] ${isInfectum ? "text-gray-500" : "text-gray-400"}`}>
+                      {tense.description}
+                    </div>
+                    <div className={`text-[9px] font-mono mt-1 ${isInfectum ? "text-gray-400" : "text-gray-500"}`}>
+                      {tense.example}
+                    </div>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Selected summary */}
+      {selectedSystem && selectedTense && (
+        <div className={`rounded-xl p-4 border animate-fade-in ${
+          selectedSystem === "infectum"
+            ? "bg-gray-50 border-gray-200"
+            : "bg-gray-900 border-gray-700"
+        }`}>
+          <p className={`text-sm ${selectedSystem === "infectum" ? "text-gray-700" : "text-gray-300"}`}>
+            <span className="font-medium">Sélection :</span>{" "}
+            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${
+              selectedSystem === "infectum"
+                ? "bg-white text-black border border-gray-300"
+                : "bg-black text-white border border-gray-600"
+            }`}>
+              {TENSE_INFO[selectedSystem].label}
+            </span>
+            {" → "}
+            <span className={`font-semibold ${selectedSystem === "infectum" ? "text-black" : "text-white"}`}>
+              {TENSE_INFO[selectedSystem].tenses[selectedTense as keyof typeof TENSE_INFO.infectum.tenses]?.label}
+            </span>
+          </p>
+          <p className={`text-xs mt-2 font-mono ${selectedSystem === "infectum" ? "text-gray-500" : "text-gray-400"}`}>
+            Terminaisons : {TENSE_INFO[selectedSystem].tenses[selectedTense as keyof typeof TENSE_INFO.infectum.tenses]?.endings}
+          </p>
+        </div>
+      )}
+
       <div className="flex justify-center pt-2">
-        <button type="submit" className="pill-glow">
+        <button 
+          type="submit" 
+          disabled={!selectedSystem || !selectedTense}
+          className="pill-glow disabled:opacity-40 disabled:cursor-not-allowed"
+        >
           Continuer
         </button>
       </div>
     </form>
   )
 }
-

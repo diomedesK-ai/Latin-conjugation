@@ -5,9 +5,23 @@ const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY,
 })
 
+const TENSE_LABELS: Record<string, string> = {
+  present: "présent",
+  imperfect: "imparfait",
+  future: "futur simple",
+  perfect: "parfait",
+  pluperfect: "plus-que-parfait",
+  futurePerfect: "futur antérieur"
+}
+
+const SYSTEM_LABELS: Record<string, string> = {
+  infectum: "Infectum (action non accomplie)",
+  perfectum: "Perfectum (action accomplie)"
+}
+
 export async function POST(request: Request) {
   try {
-    const { verb, principalParts, userAnswer, correctAnswer, studentName, category, tense } = await request.json()
+    const { verb, principalParts, userAnswer, correctAnswer, studentName, category, tense, tenseSystem } = await request.json()
 
     const normalizedUser = userAnswer.toLowerCase().replace(/\s+/g, " ").trim()
     const normalizedCorrect = correctAnswer.toLowerCase().replace(/\s+/g, " ").trim()
@@ -24,19 +38,16 @@ export async function POST(request: Request) {
       "irregular": "irrégulier"
     }
 
-    const tenseLabels: Record<string, string> = {
-      "present": "présent",
-      "imperfect": "imparfait"
-    }
-
     const categoryShort = category ? categoryLabels[category] || "" : ""
-    const tenseLabel = tense ? tenseLabels[tense] || "présent" : "présent"
+    const tenseLabel = tense ? TENSE_LABELS[tense] || "présent" : "présent"
+    const systemLabel = tenseSystem ? SYSTEM_LABELS[tenseSystem] || "" : ""
 
     const { text } = await generateText({
-      model: openai("gpt-5.1"),
+      model: openai("gpt-4o"),
       prompt: `Tu es un professeur de latin qui aide un élève nommé ${studentName} à pratiquer les conjugaisons.
 
 Le verbe est : ${principalParts} (${verb})${category ? ` - ${categoryShort}` : ''}
+Système verbal : ${systemLabel}
 Temps demandé : ${tenseLabel}
 L'élève a répondu : ${userAnswer}
 La bonne réponse est : ${correctAnswer}
@@ -46,9 +57,9 @@ La réponse est ${isCorrect ? "CORRECTE" : "INCORRECTE"}.
 ${
   isCorrect
     ? `Réponds EXACTEMENT dans ce format:
-Bravo, un verbe de [CATEGORY] à l'${tenseLabel}${category ? ` où [CATEGORY] = "${categoryShort}"` : ''}.
-Puis ajoute UNE SEULE phrase courte (maximum 10 mots) avec un détail intéressant sur ce verbe ou ce temps.`
-    : `Explique brièvement ce qui était faux dans la conjugaison à l'${tenseLabel} et donne un conseil utile pour retenir les terminaisons de l'${tenseLabel}. Sois encourageant mais pédagogique. Maximum 2 phrases courtes.`
+Bravo, un verbe de [CATEGORY] au ${tenseLabel}${category ? ` où [CATEGORY] = "${categoryShort}"` : ''}.
+Puis ajoute UNE SEULE phrase courte (maximum 10 mots) avec un détail intéressant sur ce verbe, ce temps, ou le système ${tenseSystem === "infectum" ? "de l'infectum" : "du perfectum"}.`
+    : `Explique brièvement ce qui était faux dans la conjugaison au ${tenseLabel} et donne un conseil utile pour retenir les terminaisons de ce temps (${tenseSystem === "infectum" ? "infectum" : "perfectum"}). Sois encourageant mais pédagogique. Maximum 2 phrases courtes.`
 }
 
 Réponds sur un ton amical et bienveillant. N'utilise pas d'emojis.`,

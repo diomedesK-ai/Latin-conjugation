@@ -1,22 +1,34 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect, useCallback } from "react"
 import type { ExerciseResult } from "@/app/page"
-import type { LatinVerb } from "@/lib/latin-verbs"
+import { TENSE_INFO, type TenseSystem, type LatinTense } from "@/lib/latin-verbs"
+
+type VerbData = {
+  firstPerson: string
+  secondPerson: string
+  infinitive: string
+  perfectStem?: string
+  meaning: string
+  conjugation: number | string
+  conjugatedForms: string[]
+  isCompound?: boolean
+  category?: string
+}
 
 type VerbExerciseProps = {
   studentName: string
   verbCount: number
   categories: string[]
-  tense: "present" | "imperfect"
+  tenseSystem: TenseSystem
+  tense: LatinTense
   verificationMode: "per-step" | "at-end"
   onComplete: (results: ExerciseResult[], timeInSeconds: number) => void
 }
 
-export function VerbExercise({ studentName, verbCount, categories, tense, verificationMode, onComplete }: VerbExerciseProps) {
-  const [verbs, setVerbs] = useState<LatinVerb[]>([])
+export function VerbExercise({ studentName, verbCount, categories, tenseSystem, tense, verificationMode, onComplete }: VerbExerciseProps) {
+  const [verbs, setVerbs] = useState<VerbData[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({
     singular1: "",
@@ -28,7 +40,7 @@ export function VerbExercise({ studentName, verbCount, categories, tense, verifi
   })
   const [allAnswers, setAllAnswers] = useState<
     Array<{
-      verb: LatinVerb
+      verb: VerbData
       answer: typeof answers
     }>
   >([])
@@ -40,13 +52,17 @@ export function VerbExercise({ studentName, verbCount, categories, tense, verifi
   const [startTime] = useState<number>(Date.now())
   const [incorrectFields, setIncorrectFields] = useState<Set<string>>(new Set())
 
+  const tenseInfo = TENSE_INFO[tenseSystem]
+  const currentTenseInfo = tenseInfo.tenses[tense as keyof typeof tenseInfo.tenses]
+  const isInfectum = tenseSystem === "infectum"
+
   useEffect(() => {
     async function generateVerbs() {
       try {
         const response = await fetch("/api/generate-verbs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ count: verbCount, categories, difficulty: "mixed" }),
+          body: JSON.stringify({ count: verbCount, categories, difficulty: "mixed", tense }),
         })
 
         if (response.ok) {
@@ -57,30 +73,24 @@ export function VerbExercise({ studentName, verbCount, categories, tense, verifi
         }
       } catch (error) {
         console.error("Error generating verbs:", error)
-        // Fallback: use static verbs
-        const { LATIN_VERBS } = await import("@/lib/latin-verbs")
-        const shuffled = [...LATIN_VERBS].sort(() => Math.random() - 0.5)
-        setVerbs(shuffled.slice(0, verbCount))
+        // No fallback - LLM is required
+        setVerbs([])
       } finally {
         setIsGenerating(false)
       }
     }
 
     generateVerbs()
-  }, [verbCount, categories])
+  }, [verbCount, categories, tense])
 
   const currentVerb = verbs[currentIndex]
 
-  const getConjugation = useCallback((verb: LatinVerb) => {
-    if (tense === "present") {
-      return verb.presentConjugation
-    }
-    // Fallback to present if imperfect is not available
-    return verb.imperfectConjugation || verb.presentConjugation
-  }, [tense])
+  const getConjugation = useCallback((verb: VerbData): string[] => {
+    return verb.conjugatedForms || []
+  }, [])
 
   const validateAnswer = useCallback(
-    async (verbToValidate: LatinVerb, answerToValidate: typeof answers) => {
+    async (verbToValidate: VerbData, answerToValidate: typeof answers) => {
       const userAnswer = `${answerToValidate.singular1}, ${answerToValidate.singular2}, ${answerToValidate.singular3}, ${answerToValidate.plural1}, ${answerToValidate.plural2}, ${answerToValidate.plural3}`
       const conjugation = getConjugation(verbToValidate)
       const correctAnswer = conjugation.join(", ")
@@ -97,6 +107,7 @@ export function VerbExercise({ studentName, verbCount, categories, tense, verifi
             studentName,
             category: verbToValidate.category,
             tense,
+            tenseSystem,
           }),
         })
 
@@ -112,14 +123,13 @@ export function VerbExercise({ studentName, verbCount, categories, tense, verifi
           category: verbToValidate.category,
         }
       } catch {
-        const conjugation = getConjugation(verbToValidate)
         const isCorrect =
-          answerToValidate.singular1.toLowerCase().trim() === conjugation[0].toLowerCase() &&
-          answerToValidate.singular2.toLowerCase().trim() === conjugation[1].toLowerCase() &&
-          answerToValidate.singular3.toLowerCase().trim() === conjugation[2].toLowerCase() &&
-          answerToValidate.plural1.toLowerCase().trim() === conjugation[3].toLowerCase() &&
-          answerToValidate.plural2.toLowerCase().trim() === conjugation[4].toLowerCase() &&
-          answerToValidate.plural3.toLowerCase().trim() === conjugation[5].toLowerCase()
+          answerToValidate.singular1.toLowerCase().trim() === conjugation[0]?.toLowerCase() &&
+          answerToValidate.singular2.toLowerCase().trim() === conjugation[1]?.toLowerCase() &&
+          answerToValidate.singular3.toLowerCase().trim() === conjugation[2]?.toLowerCase() &&
+          answerToValidate.plural1.toLowerCase().trim() === conjugation[3]?.toLowerCase() &&
+          answerToValidate.plural2.toLowerCase().trim() === conjugation[4]?.toLowerCase() &&
+          answerToValidate.plural3.toLowerCase().trim() === conjugation[5]?.toLowerCase()
 
         const fallbackFeedback = isCorrect ? "Correct ! Bien joué." : `La bonne réponse est : ${correctAnswer}`
 
@@ -134,7 +144,7 @@ export function VerbExercise({ studentName, verbCount, categories, tense, verifi
         }
       }
     },
-    [studentName, getConjugation],
+    [studentName, getConjugation, tense, tenseSystem],
   )
 
   const handleSubmitCurrent = async () => {
@@ -158,7 +168,7 @@ export function VerbExercise({ studentName, verbCount, categories, tense, verifi
       const correctAnswers = getConjugation(currentVerb)
 
       userAnswers.forEach((userAnswer, index) => {
-        if (userAnswer.toLowerCase().trim() !== correctAnswers[index].toLowerCase()) {
+        if (userAnswer.toLowerCase().trim() !== correctAnswers[index]?.toLowerCase()) {
           incorrect.add(
             ["singular1", "singular2", "singular3", "plural1", "plural2", "plural3"][index]
           )
@@ -170,10 +180,10 @@ export function VerbExercise({ studentName, verbCount, categories, tense, verifi
         
         // Generate helpful hint without giving the answer
         const hints = [
-          "Attention aux terminaisons du présent",
+          `Attention aux terminaisons du ${currentTenseInfo?.label || tense}`,
           "Vérifie le radical du verbe",
           "Pense à la voyelle de liaison",
-          "Rappelle-toi les terminaisons : -o, -s, -t, -mus, -tis, -nt",
+          `Rappelle-toi les terminaisons : ${currentTenseInfo?.endings || ""}`,
           "Vérifie la conjugaison du verbe",
         ]
         const randomHint = hints[Math.floor(Math.random() * hints.length)]
@@ -249,13 +259,20 @@ export function VerbExercise({ studentName, verbCount, categories, tense, verifi
     return (
       <div className="space-y-4 text-center">
         <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground" />
-        <p className="text-muted-foreground">Génération des verbes...</p>
+        <p className="text-muted-foreground">Génération des verbes au {currentTenseInfo?.label || tense}...</p>
       </div>
     )
   }
 
-  if (!currentVerb) {
-    return <p className="text-muted-foreground">Chargement des verbes...</p>
+  if (!currentVerb || verbs.length === 0) {
+    return (
+      <div className="text-center space-y-4">
+        <p className="text-muted-foreground">Erreur lors de la génération des verbes.</p>
+        <button onClick={() => window.location.reload()} className="pill-glow">
+          Réessayer
+        </button>
+      </div>
+    )
   }
 
   return (
@@ -264,20 +281,45 @@ export function VerbExercise({ studentName, verbCount, categories, tense, verifi
         <span className="text-muted-foreground">
           Verbe {currentIndex + 1} sur {verbs.length}
         </span>
-        <span className="inline-flex items-center rounded-full bg-black text-white px-3 py-1 text-xs font-medium shadow-[0_2px_10px_rgba(0,0,0,0.3)] dark:bg-white dark:text-black dark:shadow-[0_2px_10px_rgba(255,255,255,0.3)]">
-          {studentName}
-        </span>
+        <div className="flex items-center gap-2">
+          {/* Tense system badge */}
+          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
+            isInfectum
+              ? "bg-white text-black border border-gray-300 shadow-sm"
+              : "bg-black text-white border border-gray-600 shadow-sm"
+          }`}>
+            {tenseInfo.label} • {currentTenseInfo?.label}
+          </span>
+          <span className="inline-flex items-center rounded-full bg-black text-white px-3 py-1 text-xs font-medium shadow-[0_2px_10px_rgba(0,0,0,0.3)] dark:bg-white dark:text-black dark:shadow-[0_2px_10px_rgba(255,255,255,0.3)]">
+            {studentName}
+          </span>
+        </div>
       </div>
 
-      <div className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
-        <p className="mb-1 text-sm text-muted-foreground">
-          Conjuguez à l'{tense === "present" ? "indicatif présent" : "imparfait"} :
+      <div className={`rounded-2xl border p-6 shadow-sm ${
+        isInfectum
+          ? "border-gray-200 bg-white"
+          : "border-gray-700 bg-gray-900"
+      }`}>
+        <p className={`mb-1 text-sm ${isInfectum ? "text-gray-500" : "text-gray-400"}`}>
+          Conjuguez au {currentTenseInfo?.label || tense} :
         </p>
-        <p className="text-xl font-medium text-foreground">
+        <p className={`text-xl font-medium ${isInfectum ? "text-black" : "text-white"}`}>
           {currentVerb.firstPerson}, {currentVerb.secondPerson}, {currentVerb.infinitive}
         </p>
-        <p className="mt-1 text-sm text-muted-foreground">({currentVerb.meaning})</p>
-        {currentVerb.isCompound && <p className="mt-2 text-xs text-muted-foreground">Composé de « esse » (être)</p>}
+        <p className={`mt-1 text-sm ${isInfectum ? "text-gray-500" : "text-gray-400"}`}>
+          ({currentVerb.meaning})
+        </p>
+        {currentVerb.perfectStem && tenseSystem === "perfectum" && (
+          <p className={`mt-2 text-xs ${isInfectum ? "text-gray-400" : "text-gray-500"}`}>
+            Radical du parfait : {currentVerb.perfectStem}-
+          </p>
+        )}
+        {currentVerb.isCompound && (
+          <p className={`mt-2 text-xs ${isInfectum ? "text-gray-400" : "text-gray-500"}`}>
+            Composé de « esse » (être)
+          </p>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
