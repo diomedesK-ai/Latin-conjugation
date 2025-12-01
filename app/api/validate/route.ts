@@ -46,8 +46,7 @@ export async function POST(request: Request) {
       model: openai("gpt-4o"),
       prompt: `Tu es un professeur de latin qui aide un élève nommé ${studentName} à pratiquer les conjugaisons.
 
-Le verbe est : ${principalParts} (${verb})${category ? ` - ${categoryShort}` : ''}
-Système verbal : ${systemLabel}
+Le verbe est : ${principalParts} (${verb})
 Temps demandé : ${tenseLabel}
 L'élève a répondu : ${userAnswer}
 La bonne réponse est : ${correctAnswer}
@@ -56,13 +55,13 @@ La réponse est ${isCorrect ? "CORRECTE" : "INCORRECTE"}.
 
 ${
   isCorrect
-    ? `Réponds EXACTEMENT dans ce format:
-Bravo, un verbe de [CATEGORY] au ${tenseLabel}${category ? ` où [CATEGORY] = "${categoryShort}"` : ''}.
-Puis ajoute UNE SEULE phrase courte (maximum 10 mots) avec un détail intéressant sur ce verbe, ce temps, ou le système ${tenseSystem === "infectum" ? "de l'infectum" : "du perfectum"}.`
-    : `Explique brièvement ce qui était faux dans la conjugaison au ${tenseLabel} et donne un conseil utile pour retenir les terminaisons de ce temps (${tenseSystem === "infectum" ? "infectum" : "perfectum"}). Sois encourageant mais pédagogique. Maximum 2 phrases courtes.`
+    ? `Écris une réponse courte et encourageante (maximum 15 mots). 
+Mentionne que c'est correct et ajoute un détail intéressant sur ce verbe latin ou son étymologie.
+Ne répète pas la catégorie ou le type de conjugaison.`
+    : `Explique brièvement l'erreur (maximum 20 mots) et donne un conseil pour retenir les terminaisons du ${tenseLabel}. Sois encourageant.`
 }
 
-Réponds sur un ton amical et bienveillant. N'utilise pas d'emojis.`,
+Réponds sur un ton amical. N'utilise pas d'emojis. Ne mentionne pas "composé", "irrégulier" ou le numéro de conjugaison.`,
     })
 
     return Response.json({

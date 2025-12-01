@@ -466,19 +466,7 @@ export function VerbExercise({ studentName, verbCount, categories, tenseSystem, 
               </div>
             )}
             <div className="text-sm leading-relaxed flex-1">
-              {feedback.split(/(\d+ère conj\.|2ème conj\.|3ème conj\.|3ème mixte|4ème conj\.|composé|irrégulier)/g).map((part, index) => {
-                if (/\d+ère conj\.|2ème conj\.|3ème conj\.|3ème mixte|4ème conj\.|composé|irrégulier/.test(part)) {
-                  return (
-                    <span
-                      key={index}
-                      className="inline-flex items-center rounded-full bg-black text-white px-2.5 py-0.5 text-xs font-medium shadow-[0_2px_10px_rgba(0,0,0,0.3)] dark:bg-white dark:text-black dark:shadow-[0_2px_10px_rgba(255,255,255,0.3)] mx-1"
-                    >
-                      {part}
-                    </span>
-                  )
-                }
-                return <span key={index}>{part}</span>
-              })}
+              {feedback}
             </div>
           </div>
         )}
