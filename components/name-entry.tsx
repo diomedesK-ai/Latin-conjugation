@@ -44,7 +44,7 @@ export function NameEntry({ onSubmit }: NameEntryProps) {
         )}
       </div>
       <div className="flex justify-center pt-4">
-        <button type="submit" className="pill-glow">
+        <button type="submit" className="pill-button-rainbow">
           Continuer
         </button>
       </div>

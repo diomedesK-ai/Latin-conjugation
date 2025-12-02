@@ -42,6 +42,24 @@ export async function POST(request: Request) {
     const tenseLabel = tense ? TENSE_LABELS[tense] || "présent" : "présent"
     const systemLabel = tenseSystem ? SYSTEM_LABELS[tenseSystem] || "" : ""
 
+    // Find specific differences between user answer and correct answer
+    const findDifference = (user: string, correct: string): string => {
+      const userParts = user.split(/[,\s]+/).filter(Boolean)
+      const correctParts = correct.split(/[,\s]+/).filter(Boolean)
+      const differences: string[] = []
+      
+      for (let i = 0; i < Math.max(userParts.length, correctParts.length); i++) {
+        const u = userParts[i] || ""
+        const c = correctParts[i] || ""
+        if (u !== c) {
+          differences.push(`"${u}" au lieu de "${c}"`)
+        }
+      }
+      return differences.join(", ")
+    }
+
+    const specificError = !isCorrect ? findDifference(normalizedUser, normalizedCorrect) : ""
+
     const { text } = await generateText({
       model: openai("gpt-4o"),
       prompt: `Tu es un professeur de latin qui aide un élève nommé ${studentName} à pratiquer les conjugaisons.
@@ -50,6 +68,7 @@ Le verbe est : ${principalParts} (${verb})
 Temps demandé : ${tenseLabel}
 L'élève a répondu : ${userAnswer}
 La bonne réponse est : ${correctAnswer}
+${!isCorrect && specificError ? `Erreur spécifique : ${specificError}` : ""}
 
 La réponse est ${isCorrect ? "CORRECTE" : "INCORRECTE"}.
 
@@ -58,7 +77,9 @@ ${
     ? `Écris une réponse courte et encourageante (maximum 15 mots). 
 Mentionne que c'est correct et ajoute un détail intéressant sur ce verbe latin ou son étymologie.
 Ne répète pas la catégorie ou le type de conjugaison.`
-    : `Explique brièvement l'erreur (maximum 20 mots) et donne un conseil pour retenir les terminaisons du ${tenseLabel}. Sois encourageant.`
+    : `Identifie précisément la faute de l'élève (lettre manquante, mauvaise terminaison, faute de frappe). 
+Explique brièvement l'erreur en maximum 15 mots. Sois précis et encourageant.
+Par exemple si l'élève a écrit "d" au lieu de "t", mentionne cette confusion spécifique.`
 }
 
 Réponds sur un ton amical. N'utilise pas d'emojis. Ne mentionne pas "composé", "irrégulier" ou le numéro de conjugaison.`,

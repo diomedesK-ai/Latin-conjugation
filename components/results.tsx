@@ -178,9 +178,17 @@ export function Results({ studentName, results, timeInSeconds, history, onRestar
               </div>
             </div>
 
-            {/* Score and time - elegant and minimal */}
+            {/* Score and time - elegant with rainbow effect for high scores */}
             <div className="space-y-2">
-              <div className="text-6xl font-light text-foreground tracking-tight score-glow">
+              <div className={`text-7xl font-bold tracking-tight ${
+                percentage === 100 
+                  ? "score-rainbow" 
+                  : percentage >= 80 
+                    ? "text-green-500" 
+                    : percentage >= 60 
+                      ? "text-yellow-500" 
+                      : "text-foreground"
+              }`}>
                 {percentage}%
               </div>
               <p className="text-sm text-muted-foreground">

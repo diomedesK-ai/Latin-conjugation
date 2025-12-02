@@ -472,7 +472,7 @@ export function VerbExercise({ studentName, verbCount, categories, tenseSystem, 
         )}
 
         <div className="flex justify-center">
-          <button type="submit" disabled={isValidating} className="pill-glow disabled:opacity-50">
+          <button type="submit" disabled={isValidating} className={`${tenseSystem === "infectum" ? "pill-button-rainbow-light" : "pill-button-rainbow-dark"} disabled:opacity-50`}>
             {isValidating
               ? verificationMode === "at-end"
                 ? "Vérification de tous les verbes..."

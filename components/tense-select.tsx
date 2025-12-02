@@ -33,7 +33,7 @@ export function TenseSelect({ studentName, onSubmit, onBack }: TenseSelectProps)
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       <p className="text-lg text-foreground">
-        Excellent, <span className="font-semibold">{studentName}</span> !
+        Excellent, <span className="inline-flex items-center px-3 py-0.5 rounded-full bg-black text-white text-base font-medium dark:bg-white dark:text-black">{studentName}</span> !
       </p>
 
       {/* Step 1: Select System (Infectum or Perfectum) */}
@@ -49,7 +49,7 @@ export function TenseSelect({ studentName, onSubmit, onBack }: TenseSelectProps)
             className={`rounded-2xl p-5 text-left transition-all duration-300 ${
               selectedSystem === "infectum"
                 ? "text-black scale-[1.02] rainbow-glow-selected"
-                : "bg-white/80 text-gray-600 border-2 border-gray-200 hover:border-gray-300 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+                : "bg-[#c8c8c8] text-gray-700 border-2 border-gray-300 hover:border-gray-400 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
             }`}
           >
             <div className="space-y-2">
@@ -116,7 +116,7 @@ export function TenseSelect({ studentName, onSubmit, onBack }: TenseSelectProps)
                     isInfectum
                       ? isSelected
                         ? "text-black scale-[1.02] rainbow-glow-selected-subtle"
-                        : "bg-white/60 text-gray-600 border-2 border-gray-200 hover:bg-white hover:border-gray-300"
+                        : "bg-[#c8c8c8] text-gray-700 border-2 border-gray-300 hover:border-gray-400 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
                       : isSelected
                         ? "text-white scale-[1.02] rainbow-glow-selected-subtle-dark"
                         : "bg-gray-900/80 text-gray-300 border-2 border-gray-700 hover:bg-gray-900 hover:border-gray-600"
@@ -129,7 +129,7 @@ export function TenseSelect({ studentName, onSubmit, onBack }: TenseSelectProps)
                       )}
                       <span className={`font-semibold text-sm ${
                         isInfectum 
-                          ? isSelected ? "text-black" : "text-black dark:text-gray-600" 
+                          ? isSelected ? "text-black" : "text-gray-600" 
                           : "text-white"
                       }`}>
                         {tense.label}
@@ -137,14 +137,14 @@ export function TenseSelect({ studentName, onSubmit, onBack }: TenseSelectProps)
                     </div>
                     <div className={`text-[10px] ${
                       isInfectum 
-                        ? isSelected ? "text-gray-500" : "text-gray-500 dark:text-gray-600" 
+                        ? "text-gray-500"
                         : "text-gray-400"
                     }`}>
                       {tense.description}
                     </div>
                     <div className={`text-[9px] font-mono mt-1 ${
                       isInfectum 
-                        ? isSelected ? "text-gray-400" : "text-gray-400 dark:text-gray-600" 
+                        ? "text-gray-400"
                         : "text-gray-500"
                     }`}>
                       {tense.example}
@@ -190,7 +190,7 @@ export function TenseSelect({ studentName, onSubmit, onBack }: TenseSelectProps)
           <button 
             type="button" 
             onClick={onBack}
-            className="rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+            className="rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-300 border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
           >
             Retour
           </button>
@@ -198,7 +198,13 @@ export function TenseSelect({ studentName, onSubmit, onBack }: TenseSelectProps)
         <button 
           type="submit" 
           disabled={!selectedSystem || !selectedTense}
-          className="pill-glow disabled:opacity-40 disabled:cursor-not-allowed"
+          className={`disabled:cursor-not-allowed ${
+            (!selectedSystem || !selectedTense) 
+              ? "pill-button-disabled" 
+              : selectedSystem === "infectum"
+                ? "pill-button-rainbow-light"
+                : "pill-button-rainbow-dark"
+          }`}
         >
           Continuer
         </button>
