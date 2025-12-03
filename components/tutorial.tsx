@@ -15,64 +15,115 @@ type TutorialStep = {
 const steps: TutorialStep[] = [
   {
     title: "Bienvenue",
-    description: "Maîtrisez la conjugaison latine avec l'Infectum et le Perfectum",
+    description: "Maîtrisez le latin avec la conjugaison, les déclinaisons et les prépositions",
   },
   {
     title: "Entrez votre nom",
     description: "Personnalisez votre expérience d'apprentissage",
   },
   {
-    title: "Infectum ou Perfectum",
-    description: "Choisissez le système verbal à pratiquer",
+    title: "3 exercices",
+    description: "Choisissez votre type d'entraînement",
     content: (
-      <div className="grid grid-cols-2 gap-3 mt-4">
-        <div className="rounded-xl p-4 bg-white border border-gray-200 text-left">
-          <div className="font-bold text-black text-sm mb-2">Infectum</div>
-          <div className="text-[10px] text-gray-500 space-y-1">
-            <div>• Présent : amo, amas...</div>
-            <div>• Imparfait : amabam...</div>
-            <div>• Futur : amabo...</div>
-          </div>
-          <div className="text-[9px] text-gray-400 mt-2">Action non accomplie</div>
+      <div className="grid grid-cols-3 gap-2 mt-4">
+        <div className="rounded-xl p-3 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border border-gray-300 dark:border-gray-700 text-left">
+          <div className="text-2xl mb-1">🔄</div>
+          <div className="font-bold text-foreground text-xs">Conjugaison</div>
+          <div className="text-[9px] text-muted-foreground mt-1">6 temps</div>
         </div>
-        <div className="rounded-xl p-4 bg-gray-900 border border-gray-700 text-left">
-          <div className="font-bold text-white text-sm mb-2">Perfectum</div>
-          <div className="text-[10px] text-gray-400 space-y-1">
-            <div>• Parfait : amavi...</div>
-            <div>• Plus-que-parf. : amaveram...</div>
-            <div>• Futur ant. : amavero...</div>
-          </div>
-          <div className="text-[9px] text-gray-500 mt-2">Action accomplie</div>
+        <div className="rounded-xl p-3 bg-white border border-gray-200 text-left">
+          <div className="text-2xl mb-1">📝</div>
+          <div className="font-bold text-gray-800 text-xs">Déclinaison</div>
+          <div className="text-[9px] text-gray-500 mt-1">6 cas</div>
+        </div>
+        <div className="rounded-xl p-3 bg-gray-900 border border-gray-700 text-left">
+          <div className="text-2xl mb-1">🔗</div>
+          <div className="font-bold text-white text-xs">Prépositions</div>
+          <div className="text-[9px] text-gray-400 mt-1">Acc/Abl</div>
         </div>
       </div>
     )
   },
   {
-    title: "Choisissez le temps",
-    description: "Sélectionnez le temps précis à pratiquer dans le système choisi",
-  },
-  {
-    title: "Sélectionnez les catégories",
-    description: "1ère, 2ème, 3ème, 4ème conjugaison ou verbes irréguliers",
-  },
-  {
-    title: "Conjuguez",
-    description: "Pratiquez les 6 formes du temps choisi (minimum 1 verbe)",
+    title: "Conjugaison",
+    description: "Infectum (non accompli) ou Perfectum (accompli)",
     content: (
-      <div className="rounded-xl border border-border/50 bg-card/50 p-4 mt-4 text-left">
-        <p className="text-xs font-medium text-foreground mb-2">Exemple au parfait :</p>
-        <p className="text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">video, vides, videre</span> (voir)
-        </p>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Réponse : <span className="font-medium text-foreground">vidi, vidisti, vidit, vidimus, vidistis, viderunt</span>
-        </p>
+      <div className="grid grid-cols-2 gap-3 mt-4">
+        <div className="rounded-xl p-3 bg-white border border-gray-200 text-left">
+          <div className="font-bold text-black text-xs mb-1.5">Infectum</div>
+          <div className="text-[9px] text-gray-500 space-y-0.5">
+            <div>• Présent</div>
+            <div>• Imparfait</div>
+            <div>• Futur</div>
+          </div>
+        </div>
+        <div className="rounded-xl p-3 bg-gray-900 border border-gray-700 text-left">
+          <div className="font-bold text-white text-xs mb-1.5">Perfectum</div>
+          <div className="text-[9px] text-gray-400 space-y-0.5">
+            <div>• Parfait</div>
+            <div>• Plus-que-parfait</div>
+            <div>• Futur antérieur</div>
+          </div>
+        </div>
+      </div>
+    )
+  },
+  {
+    title: "Déclinaison",
+    description: "Pratiquez les 6 cas latins au singulier ou pluriel",
+    content: (
+      <div className="rounded-xl border border-border/50 bg-card/50 p-4 mt-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-left">
+            <div className="font-medium text-xs text-foreground mb-2">Les 6 cas :</div>
+            <div className="text-[9px] text-muted-foreground space-y-0.5">
+              <div>• <span className="font-bold">N</span> Nominatif (sujet)</div>
+              <div>• <span className="font-bold">V</span> Vocatif (appel)</div>
+              <div>• <span className="font-bold">Ac</span> Accusatif (COD)</div>
+              <div>• <span className="font-bold">G</span> Génitif (du/de la)</div>
+              <div>• <span className="font-bold">D</span> Datif (à/pour)</div>
+              <div>• <span className="font-bold">Ab</span> Ablatif (par/avec)</div>
+            </div>
+          </div>
+          <div className="text-left">
+            <div className="font-medium text-xs text-foreground mb-2">Exemple (1ère) :</div>
+            <div className="text-[9px] text-muted-foreground font-mono">
+              rosa, rosae →<br/>
+              rosa, rosa, rosam,<br/>
+              rosae, rosae, rosā
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  },
+  {
+    title: "Prépositions",
+    description: "Maîtrisez les cas régis par chaque préposition",
+    content: (
+      <div className="grid grid-cols-2 gap-3 mt-4">
+        <div className="rounded-xl p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-left">
+          <div className="font-bold text-blue-700 dark:text-blue-300 text-xs mb-1.5">+ Accusatif</div>
+          <div className="text-[9px] text-blue-600 dark:text-blue-400 space-y-0.5 font-mono">
+            <div>ad, ante, per</div>
+            <div>post, trans...</div>
+          </div>
+          <div className="text-[8px] text-blue-500 mt-1.5">→ mouvement</div>
+        </div>
+        <div className="rounded-xl p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 text-left">
+          <div className="font-bold text-purple-700 dark:text-purple-300 text-xs mb-1.5">+ Ablatif</div>
+          <div className="text-[9px] text-purple-600 dark:text-purple-400 space-y-0.5 font-mono">
+            <div>a/ab, cum, de</div>
+            <div>e/ex, sine...</div>
+          </div>
+          <div className="text-[8px] text-purple-500 mt-1.5">→ origine/moyen</div>
+        </div>
       </div>
     )
   },
   {
     title: "Progressez",
-    description: "L'IA génère des verbes et vous donne un feedback personnalisé",
+    description: "L'IA génère des exercices et vous donne un feedback personnalisé",
   },
 ]
 

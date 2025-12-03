@@ -95,3 +95,5 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - The design follows Apple's minimal aesthetic principles
 
 
+
+

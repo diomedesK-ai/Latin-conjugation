@@ -8,9 +8,10 @@ type VerbCountSelectProps = {
   studentName: string
   onSubmit: (count: number, mode: "per-step" | "at-end") => void
   onBack?: () => void
+  label?: string
 }
 
-export function VerbCountSelect({ studentName, onSubmit, onBack }: VerbCountSelectProps) {
+export function VerbCountSelect({ studentName, onSubmit, onBack, label }: VerbCountSelectProps) {
   const [count, setCount] = useState("10")
   const [mode, setMode] = useState<"per-step" | "at-end">("per-step")
   const [error, setError] = useState("")
@@ -37,7 +38,7 @@ export function VerbCountSelect({ studentName, onSubmit, onBack }: VerbCountSele
 
       <div className="space-y-3">
         <label htmlFor="count" className="block text-sm font-medium text-foreground">
-          Combien de verbes souhaitez-vous pratiquer ?
+          {label || "Combien de verbes souhaitez-vous pratiquer ?"}
         </label>
         <input
           id="count"

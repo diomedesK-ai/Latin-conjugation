@@ -13,7 +13,14 @@ import { LeaderboardModal } from "@/components/leaderboard-modal"
 import { ResetModal } from "@/components/reset-modal"
 import { PoemDisplay } from "@/components/poem-display"
 import { TenseSelect } from "@/components/tense-select"
+import { LearningPathSelect, type LearningPath } from "@/components/learning-path-select"
+import { DeclensionSelect } from "@/components/declension-select"
+import { PrepositionSelect } from "@/components/preposition-select"
+import { DeclensionExercise } from "@/components/declension-exercise"
+import { PrepositionExercise } from "@/components/preposition-exercise"
 import type { TenseSystem, LatinTense } from "@/lib/latin-verbs"
+import type { DeclensionNumber, DeclensionNumber2 } from "@/lib/latin-declensions"
+import type { PrepositionCase } from "@/lib/latin-prepositions"
 
 export type ExerciseResult = {
   verb: string
@@ -32,16 +39,50 @@ export type SessionHistory = {
   timeInSeconds: number
 }
 
+type Step = 
+  | "name" 
+  | "poem" 
+  | "path"
+  // Conjugation path
+  | "tense" 
+  | "categories" 
+  | "count" 
+  | "exercise"
+  // Declension path
+  | "declension-select"
+  | "declension-count"
+  | "declension-exercise"
+  // Preposition path
+  | "preposition-select"
+  | "preposition-count"
+  | "preposition-exercise"
+  // Shared
+  | "results"
+
 export default function Home() {
   const [showTutorial, setShowTutorial] = useState(true)
   const [showLeaderboardModal, setShowLeaderboardModal] = useState(false)
   const [showResetModal, setShowResetModal] = useState(false)
-  const [step, setStep] = useState<"name" | "poem" | "tense" | "categories" | "count" | "exercise" | "results">("name")
+  const [step, setStep] = useState<Step>("name")
   const [studentName, setStudentName] = useState("")
+  
+  // Learning path
+  const [learningPath, setLearningPath] = useState<LearningPath>("conjugaison")
+  
+  // Conjugation state
   const [selectedTenseSystem, setSelectedTenseSystem] = useState<TenseSystem>("infectum")
   const [selectedTense, setSelectedTense] = useState<LatinTense>("present")
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [verbCount, setVerbCount] = useState(10)
+  
+  // Declension state
+  const [selectedDeclension, setSelectedDeclension] = useState<DeclensionNumber>("1")
+  const [selectedNumber, setSelectedNumber] = useState<DeclensionNumber2>("singular")
+  
+  // Preposition state
+  const [selectedPrepositionCase, setSelectedPrepositionCase] = useState<PrepositionCase>("accusative")
+  
+  // Shared state
+  const [itemCount, setItemCount] = useState(10)
   const [verificationMode, setVerificationMode] = useState<"per-step" | "at-end">("per-step")
   const [results, setResults] = useState<ExerciseResult[]>([])
   const [timeInSeconds, setTimeInSeconds] = useState(0)
@@ -66,10 +107,14 @@ export default function Home() {
   const handleReset = () => {
     setStep("name")
     setStudentName("")
+    setLearningPath("conjugaison")
     setSelectedTenseSystem("infectum")
     setSelectedTense("present")
     setSelectedCategories([])
-    setVerbCount(10)
+    setSelectedDeclension("1")
+    setSelectedNumber("singular")
+    setSelectedPrepositionCase("accusative")
+    setItemCount(10)
     setVerificationMode("per-step")
     setResults([])
     setTimeInSeconds(0)
@@ -81,9 +126,21 @@ export default function Home() {
   }
 
   const handlePoemComplete = () => {
-    setStep("tense")
+    setStep("path")
   }
 
+  const handlePathSubmit = (path: LearningPath) => {
+    setLearningPath(path)
+    if (path === "conjugaison") {
+      setStep("tense")
+    } else if (path === "declinaison") {
+      setStep("declension-select")
+    } else {
+      setStep("preposition-select")
+    }
+  }
+
+  // Conjugation handlers
   const handleTenseSubmit = (tenseSystem: TenseSystem, tense: LatinTense) => {
     setSelectedTenseSystem(tenseSystem)
     setSelectedTense(tense)
@@ -96,11 +153,37 @@ export default function Home() {
   }
 
   const handleCountSubmit = (count: number, mode: "per-step" | "at-end") => {
-    setVerbCount(count)
+    setItemCount(count)
     setVerificationMode(mode)
     setStep("exercise")
   }
 
+  // Declension handlers
+  const handleDeclensionSelect = (declension: DeclensionNumber, number: DeclensionNumber2) => {
+    setSelectedDeclension(declension)
+    setSelectedNumber(number)
+    setStep("declension-count")
+  }
+
+  const handleDeclensionCountSubmit = (count: number, mode: "per-step" | "at-end") => {
+    setItemCount(count)
+    setVerificationMode(mode)
+    setStep("declension-exercise")
+  }
+
+  // Preposition handlers
+  const handlePrepositionSelect = (caseType: PrepositionCase) => {
+    setSelectedPrepositionCase(caseType)
+    setStep("preposition-count")
+  }
+
+  const handlePrepositionCountSubmit = (count: number, mode: "per-step" | "at-end") => {
+    setItemCount(count)
+    setVerificationMode(mode)
+    setStep("preposition-exercise")
+  }
+
+  // Shared handlers
   const handleExerciseComplete = (exerciseResults: ExerciseResult[], time: number) => {
     setResults(exerciseResults)
     setTimeInSeconds(time)
@@ -120,16 +203,24 @@ export default function Home() {
   }
 
   const handleRestart = () => {
-    setStep("name")
-    setStudentName("")
-    setSelectedTenseSystem("infectum")
-    setSelectedTense("present")
-    setSelectedCategories([])
-    setVerbCount(10)
-    setVerificationMode("per-step")
-    setResults([])
-    setTimeInSeconds(0)
+    handleReset()
   }
+
+  // Get title based on learning path
+  const getTitle = () => {
+    switch (learningPath) {
+      case "conjugaison":
+        return { title: "Conjugaison Latine", subtitle: "Infectum & Perfectum" }
+      case "declinaison":
+        return { title: "Déclinaisons Latines", subtitle: "1ère, 2ème, 3ème déclinaison" }
+      case "preposition":
+        return { title: "Prépositions Latines", subtitle: "Accusatif & Ablatif" }
+      default:
+        return { title: "Latin", subtitle: "Pratiquez votre latin" }
+    }
+  }
+
+  const { title, subtitle } = getTitle()
 
   return (
     <main className="min-h-screen bg-background p-6 md:p-8">
@@ -153,20 +244,32 @@ export default function Home() {
       <div className="mx-auto max-w-2xl pt-8 md:pt-12">
         <div className="mb-12 text-center">
           <h1 className="mb-3 text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
-            Conjugaison Latine
+            {step === "name" || step === "poem" || step === "path" ? "Latin" : title}
           </h1>
-          <p className="text-base text-muted-foreground md:text-lg">Infectum & Perfectum</p>
+          <p className="text-base text-muted-foreground md:text-lg">
+            {step === "name" || step === "poem" ? "Pratiquez vos conjugaisons latines" : 
+             step === "path" ? "Choisissez votre exercice" : subtitle}
+          </p>
         </div>
 
         {step === "name" && <NameEntry onSubmit={handleNameSubmit} />}
 
         {step === "poem" && <PoemDisplay studentName={studentName} onComplete={handlePoemComplete} />}
 
+        {step === "path" && (
+          <LearningPathSelect 
+            studentName={studentName} 
+            onSubmit={handlePathSubmit}
+            onBack={() => setStep("name")}
+          />
+        )}
+
+        {/* Conjugation path */}
         {step === "tense" && (
           <TenseSelect 
             studentName={studentName} 
             onSubmit={handleTenseSubmit}
-            onBack={() => setStep("name")}
+            onBack={() => setStep("path")}
           />
         )}
 
@@ -189,7 +292,7 @@ export default function Home() {
         {step === "exercise" && (
           <VerbExercise
             studentName={studentName}
-            verbCount={verbCount}
+            verbCount={itemCount}
             categories={selectedCategories}
             tenseSystem={selectedTenseSystem}
             tense={selectedTense}
@@ -198,6 +301,63 @@ export default function Home() {
           />
         )}
 
+        {/* Declension path */}
+        {step === "declension-select" && (
+          <DeclensionSelect
+            studentName={studentName}
+            onSubmit={handleDeclensionSelect}
+            onBack={() => setStep("path")}
+          />
+        )}
+
+        {step === "declension-count" && (
+          <VerbCountSelect 
+            studentName={studentName} 
+            onSubmit={handleDeclensionCountSubmit}
+            onBack={() => setStep("declension-select")}
+            label="Combien de noms voulez-vous décliner ?"
+          />
+        )}
+
+        {step === "declension-exercise" && (
+          <DeclensionExercise
+            studentName={studentName}
+            nounCount={itemCount}
+            declension={selectedDeclension}
+            number={selectedNumber}
+            verificationMode={verificationMode}
+            onComplete={handleExerciseComplete}
+          />
+        )}
+
+        {/* Preposition path */}
+        {step === "preposition-select" && (
+          <PrepositionSelect
+            studentName={studentName}
+            onSubmit={handlePrepositionSelect}
+            onBack={() => setStep("path")}
+          />
+        )}
+
+        {step === "preposition-count" && (
+          <VerbCountSelect 
+            studentName={studentName} 
+            onSubmit={handlePrepositionCountSubmit}
+            onBack={() => setStep("preposition-select")}
+            label="Combien de questions voulez-vous ?"
+          />
+        )}
+
+        {step === "preposition-exercise" && (
+          <PrepositionExercise
+            studentName={studentName}
+            questionCount={itemCount}
+            caseType={selectedPrepositionCase}
+            onComplete={handleExerciseComplete}
+          />
+        )}
+
+        {/* Shared results */}
         {step === "results" && (
           <Results
             studentName={studentName}
