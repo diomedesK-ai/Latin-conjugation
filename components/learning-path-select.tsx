@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState } from "react"
 
-export type LearningPath = "conjugaison" | "declinaison" | "preposition"
+export type LearningPath = "conjugaison" | "declinaison" | "traduction"
 
 type LearningPathSelectProps = {
   studentName: string
@@ -21,17 +21,17 @@ const PATH_INFO = {
   },
   declinaison: {
     label: "Déclinaison",
-    description: "Noms & adjectifs",
-    details: "1ère, 2ème, 3ème",
-    subdetails: "6 cas • Singulier/Pluriel",
-    examples: ["rosa, rosae, rosam...", "dominus, domini..."],
+    description: "Noms & prépositions",
+    details: "1ère, 2ème, 3ème + Prép.",
+    subdetails: "6 cas • Singulier/Pluriel • Régimes",
+    examples: ["rosa, rosae...", "ad + acc", "ab + abl"],
   },
-  preposition: {
-    label: "Prépositions",
-    description: "Régimes des cas",
-    details: "Accusatif & Ablatif",
-    subdetails: "Prépositions latines",
-    examples: ["ad + acc", "ab + abl", "in + acc/abl"],
+  traduction: {
+    label: "Traduction",
+    description: "Prononciation & sens",
+    details: "FR ↔ LA",
+    subdetails: "Vocabulaire & expressions",
+    examples: ["aqua → eau", "guerre → bellum"],
   }
 }
 
@@ -63,13 +63,17 @@ const DeclinaisonIcon = ({ selected }: { selected: boolean }) => (
   </div>
 )
 
-const PrepositionIcon = ({ selected }: { selected: boolean }) => (
+const TraductionIcon = ({ selected }: { selected: boolean }) => (
   <div className={`w-16 h-16 rounded-full border-2 flex items-center justify-center transition-all ${
     selected ? "border-white" : "border-gray-500"
   }`}>
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={selected ? "text-white" : "text-gray-400"}>
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
+      <path d="m5 8 6 6" />
+      <path d="m4 14 6-6 2-3" />
+      <path d="M2 5h12" />
+      <path d="M7 2h1" />
+      <path d="m22 22-5-10-5 10" />
+      <path d="M14 18h6" />
     </svg>
   </div>
 )
@@ -183,37 +187,37 @@ export function LearningPathSelect({ studentName, onSubmit, onBack }: LearningPa
             </div>
           </button>
 
-          {/* Prépositions - BLACK when selected */}
+          {/* Traduction - BLACK when selected */}
           <button
             type="button"
-            onClick={() => setSelectedPath("preposition")}
+            onClick={() => setSelectedPath("traduction")}
             className={`rounded-2xl p-8 text-left transition-all duration-300 min-h-[280px] ${
-              selectedPath === "preposition"
+              selectedPath === "traduction"
                 ? "scale-[1.02] rainbow-glow-selected-dark"
                 : "bg-gray-900/90 dark:bg-gray-950 text-gray-300 border-2 border-gray-700 hover:border-gray-600"
             }`}
           >
             <div className="flex flex-col items-center text-center gap-4 h-full">
-              <PrepositionIcon selected={selectedPath === "preposition"} />
+              <TraductionIcon selected={selectedPath === "traduction"} />
               <div className="space-y-2.5 flex-1">
                 <div className="flex items-center justify-center gap-2">
-                  <div className={`indicator-dot ${selectedPath === "preposition" ? "rainbow-dot" : "bg-gray-700 border border-gray-500"}`} />
+                  <div className={`indicator-dot ${selectedPath === "traduction" ? "rainbow-dot" : "bg-gray-700 border border-gray-500"}`} />
                   <span className="font-bold text-lg text-white">
-                    {PATH_INFO.preposition.label}
+                    {PATH_INFO.traduction.label}
                   </span>
                 </div>
                 <p className="text-sm text-gray-400">
-                  {PATH_INFO.preposition.description}
+                  {PATH_INFO.traduction.description}
                 </p>
                 <p className="text-sm font-medium text-gray-400">
-                  {PATH_INFO.preposition.details}
+                  {PATH_INFO.traduction.details}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {PATH_INFO.preposition.subdetails}
+                  {PATH_INFO.traduction.subdetails}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 justify-center mt-auto">
-                {PATH_INFO.preposition.examples.map((ex, i) => (
+                {PATH_INFO.traduction.examples.map((ex, i) => (
                   <span key={i} className="text-[10px] px-2.5 py-1 rounded-full bg-gray-800 text-gray-300 font-mono">
                     {ex}
                   </span>
@@ -240,7 +244,7 @@ export function LearningPathSelect({ studentName, onSubmit, onBack }: LearningPa
           className={`disabled:cursor-not-allowed ${
             !selectedPath
               ? "pill-button-disabled" 
-              : selectedPath === "preposition"
+              : selectedPath === "traduction"
                 ? "pill-button-rainbow-dark"
                 : selectedPath === "declinaison"
                   ? "pill-button-rainbow-grey"

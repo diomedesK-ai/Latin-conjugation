@@ -15,7 +15,7 @@ type TutorialStep = {
 const steps: TutorialStep[] = [
   {
     title: "Bienvenue",
-    description: "Maîtrisez le latin avec la conjugaison, les déclinaisons et les prépositions",
+    description: "Maîtrisez le latin avec la conjugaison, les déclinaisons et la traduction",
   },
   {
     title: "Entrez votre nom",
@@ -35,23 +35,23 @@ const steps: TutorialStep[] = [
           <div className="font-bold text-foreground text-xs">Conjugaison</div>
           <div className="text-[9px] text-muted-foreground mt-1">6 temps</div>
         </div>
-        <div className="rounded-xl p-3 bg-white border border-gray-200 text-left">
+        <div className="rounded-xl p-3 bg-[#c8c8c8] border border-gray-300 text-left">
           <div className="w-8 h-8 rounded-full border-2 border-gray-400 flex items-center justify-center mb-1">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500">
               <path d="M4 6h16M4 12h16M4 18h16M8 3v3M16 18v3" />
             </svg>
           </div>
-          <div className="font-bold text-gray-800 text-xs">Déclinaison</div>
-          <div className="text-[9px] text-gray-500 mt-1">6 cas</div>
+          <div className="font-bold text-gray-700 text-xs">Déclinaison</div>
+          <div className="text-[9px] text-gray-500 mt-1">+ Prépositions</div>
         </div>
         <div className="rounded-xl p-3 bg-gray-900 border border-gray-700 text-left">
           <div className="w-8 h-8 rounded-full border-2 border-gray-500 flex items-center justify-center mb-1">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400">
-              <path d="M5 12h14M12 5l7 7-7 7" />
+              <path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6" />
             </svg>
           </div>
-          <div className="font-bold text-white text-xs">Prépositions</div>
-          <div className="text-[9px] text-gray-400 mt-1">Acc/Abl</div>
+          <div className="font-bold text-white text-xs">Traduction</div>
+          <div className="text-[9px] text-gray-400 mt-1">FR ↔ LA</div>
         </div>
       </div>
     )
@@ -111,7 +111,7 @@ const steps: TutorialStep[] = [
   },
   {
     title: "Prépositions",
-    description: "Maîtrisez les cas régis par chaque préposition",
+    description: "Dans Déclinaison : maîtrisez les cas régis par chaque préposition",
     content: (
       <div className="grid grid-cols-2 gap-3 mt-4">
         <div className="rounded-xl p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-left">
@@ -129,6 +129,28 @@ const steps: TutorialStep[] = [
             <div>e/ex, sine...</div>
           </div>
           <div className="text-[8px] text-purple-500 mt-1.5">→ origine/moyen</div>
+        </div>
+      </div>
+    )
+  },
+  {
+    title: "Traduction",
+    description: "Enrichissez votre vocabulaire latin",
+    content: (
+      <div className="grid grid-cols-2 gap-3 mt-4">
+        <div className="rounded-xl p-3 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border border-gray-300 dark:border-gray-700 text-left">
+          <div className="font-bold text-foreground text-xs mb-1.5">FR → LA</div>
+          <div className="text-[9px] text-muted-foreground space-y-0.5 font-mono">
+            <div>eau → aqua</div>
+            <div>guerre → bellum</div>
+          </div>
+        </div>
+        <div className="rounded-xl p-3 bg-gray-900 border border-gray-700 text-left">
+          <div className="font-bold text-white text-xs mb-1.5">LA → FR</div>
+          <div className="text-[9px] text-gray-400 space-y-0.5 font-mono">
+            <div>rosa → rose</div>
+            <div>rex → roi</div>
+          </div>
         </div>
       </div>
     )

@@ -15,9 +15,10 @@ import { PoemDisplay } from "@/components/poem-display"
 import { TenseSelect } from "@/components/tense-select"
 import { LearningPathSelect, type LearningPath } from "@/components/learning-path-select"
 import { DeclensionSelect } from "@/components/declension-select"
-import { PrepositionSelect } from "@/components/preposition-select"
 import { DeclensionExercise } from "@/components/declension-exercise"
 import { PrepositionExercise } from "@/components/preposition-exercise"
+import { TranslationSelect, type TranslationDirection } from "@/components/translation-select"
+import { TranslationExercise } from "@/components/translation-exercise"
 import type { TenseSystem, LatinTense } from "@/lib/latin-verbs"
 import type { DeclensionNumber, DeclensionNumber2 } from "@/lib/latin-declensions"
 import type { PrepositionCase } from "@/lib/latin-prepositions"
@@ -48,14 +49,16 @@ type Step =
   | "categories" 
   | "count" 
   | "exercise"
-  // Declension path
+  // Declension path (includes prepositions as sub-option)
   | "declension-select"
   | "declension-count"
   | "declension-exercise"
-  // Preposition path
-  | "preposition-select"
   | "preposition-count"
   | "preposition-exercise"
+  // Translation path
+  | "translation-select"
+  | "translation-count"
+  | "translation-exercise"
   // Shared
   | "results"
 
@@ -78,8 +81,11 @@ export default function Home() {
   const [selectedDeclension, setSelectedDeclension] = useState<DeclensionNumber>("1")
   const [selectedNumber, setSelectedNumber] = useState<DeclensionNumber2>("singular")
   
-  // Preposition state
+  // Preposition state (now sub-option of declension)
   const [selectedPrepositionCase, setSelectedPrepositionCase] = useState<PrepositionCase>("accusative")
+  
+  // Translation state
+  const [selectedTranslationDirection, setSelectedTranslationDirection] = useState<TranslationDirection>("fr-la")
   
   // Shared state
   const [itemCount, setItemCount] = useState(10)
@@ -114,6 +120,7 @@ export default function Home() {
     setSelectedDeclension("1")
     setSelectedNumber("singular")
     setSelectedPrepositionCase("accusative")
+    setSelectedTranslationDirection("fr-la")
     setItemCount(10)
     setVerificationMode("per-step")
     setResults([])
@@ -136,7 +143,7 @@ export default function Home() {
     } else if (path === "declinaison") {
       setStep("declension-select")
     } else {
-      setStep("preposition-select")
+      setStep("translation-select")
     }
   }
 
@@ -171,7 +178,7 @@ export default function Home() {
     setStep("declension-exercise")
   }
 
-  // Preposition handlers
+  // Preposition handlers (prepositions are now under declension)
   const handlePrepositionSelect = (caseType: PrepositionCase) => {
     setSelectedPrepositionCase(caseType)
     setStep("preposition-count")
@@ -181,6 +188,18 @@ export default function Home() {
     setItemCount(count)
     setVerificationMode(mode)
     setStep("preposition-exercise")
+  }
+
+  // Translation handlers
+  const handleTranslationSelect = (direction: TranslationDirection) => {
+    setSelectedTranslationDirection(direction)
+    setStep("translation-count")
+  }
+
+  const handleTranslationCountSubmit = (count: number, mode: "per-step" | "at-end") => {
+    setItemCount(count)
+    setVerificationMode(mode)
+    setStep("translation-exercise")
   }
 
   // Shared handlers
@@ -212,9 +231,9 @@ export default function Home() {
       case "conjugaison":
         return { title: "Conjugaison Latine", subtitle: "Infectum & Perfectum" }
       case "declinaison":
-        return { title: "Déclinaisons Latines", subtitle: "1ère, 2ème, 3ème déclinaison" }
-      case "preposition":
-        return { title: "Prépositions Latines", subtitle: "Accusatif & Ablatif" }
+        return { title: "Déclinaisons Latines", subtitle: "Déclinaisons & Prépositions" }
+      case "traduction":
+        return { title: "Traduction Latine", subtitle: "Vocabulaire FR ↔ LA" }
       default:
         return { title: "Latin", subtitle: "Pratiquez votre latin" }
     }
@@ -301,11 +320,12 @@ export default function Home() {
           />
         )}
 
-        {/* Declension path */}
+        {/* Declension path (includes prepositions) */}
         {step === "declension-select" && (
           <DeclensionSelect
             studentName={studentName}
             onSubmit={handleDeclensionSelect}
+            onPrepositionSubmit={handlePrepositionSelect}
             onBack={() => setStep("path")}
           />
         )}
@@ -330,20 +350,11 @@ export default function Home() {
           />
         )}
 
-        {/* Preposition path */}
-        {step === "preposition-select" && (
-          <PrepositionSelect
-            studentName={studentName}
-            onSubmit={handlePrepositionSelect}
-            onBack={() => setStep("path")}
-          />
-        )}
-
         {step === "preposition-count" && (
           <VerbCountSelect 
             studentName={studentName} 
             onSubmit={handlePrepositionCountSubmit}
-            onBack={() => setStep("preposition-select")}
+            onBack={() => setStep("declension-select")}
             label="Combien de questions voulez-vous ?"
           />
         )}
@@ -353,6 +364,34 @@ export default function Home() {
             studentName={studentName}
             questionCount={itemCount}
             caseType={selectedPrepositionCase}
+            onComplete={handleExerciseComplete}
+          />
+        )}
+
+        {/* Translation path */}
+        {step === "translation-select" && (
+          <TranslationSelect
+            studentName={studentName}
+            onSubmit={handleTranslationSelect}
+            onBack={() => setStep("path")}
+          />
+        )}
+
+        {step === "translation-count" && (
+          <VerbCountSelect 
+            studentName={studentName} 
+            onSubmit={handleTranslationCountSubmit}
+            onBack={() => setStep("translation-select")}
+            label="Combien de mots voulez-vous traduire ?"
+          />
+        )}
+
+        {step === "translation-exercise" && (
+          <TranslationExercise
+            studentName={studentName}
+            wordCount={itemCount}
+            direction={selectedTranslationDirection}
+            verificationMode={verificationMode}
             onComplete={handleExerciseComplete}
           />
         )}

@@ -211,15 +211,17 @@ export function DeclensionExercise({
       setResults((prev) => [...prev, result])
       setIsValidating(false)
     } else {
-      setAllAnswers((prev) => [...prev, { noun: currentNoun, answer: { ...answers } }])
-      handleNext()
+      // Store current answer and pass to handleNext to avoid stale state issue
+      const updatedAnswers = [...allAnswers, { noun: currentNoun, answer: { ...answers } }]
+      setAllAnswers(updatedAnswers)
+      handleNext(updatedAnswers)
     }
   }
 
-  const handleNext = () => {
+  const handleNext = (updatedAnswers?: typeof allAnswers) => {
     if (currentIndex + 1 >= nouns.length) {
       if (verificationMode === "at-end") {
-        validateAllAnswers()
+        validateAllAnswers(updatedAnswers || allAnswers)
       } else {
         const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000)
         onComplete(results, elapsedSeconds)
@@ -240,12 +242,12 @@ export function DeclensionExercise({
     }
   }
 
-  const validateAllAnswers = async () => {
+  const validateAllAnswers = async (answersToValidate: typeof allAnswers) => {
     setIsValidating(true)
 
     const validationResults: ExerciseResult[] = []
 
-    for (const { noun, answer } of allAnswers) {
+    for (const { noun, answer } of answersToValidate) {
       const result = await validateAnswer(noun, answer)
       validationResults.push(result)
     }

@@ -39,10 +39,11 @@ export async function POST(request: Request) {
 
   const { noun, genitive, userAnswer, correctAnswer, studentName, declension, number } = requestData
 
-  // Simple comparison
+  // Simple comparison - must have same number of forms and all must match
   const userForms = userAnswer.toLowerCase().split(",").map((s: string) => s.trim())
   const correctForms = correctAnswer.toLowerCase().split(",").map((s: string) => s.trim())
-  const isCorrect = userForms.every((form: string, i: number) => form === correctForms[i])
+  const isCorrect = userForms.length === correctForms.length && 
+    userForms.every((form: string, i: number) => form === correctForms[i])
 
   try {
     if (isCorrect) {
