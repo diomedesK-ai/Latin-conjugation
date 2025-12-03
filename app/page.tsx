@@ -241,13 +241,13 @@ export default function Home() {
         <ThemeToggle />
       </div>
 
-      <div className="mx-auto max-w-2xl pt-8 md:pt-12">
+      <div className={`mx-auto pt-8 md:pt-12 ${step === "path" ? "max-w-6xl px-4" : "max-w-2xl"}`}>
         <div className="mb-12 text-center">
           <h1 className="mb-3 text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
             {step === "name" || step === "poem" || step === "path" ? "Latin" : title}
           </h1>
           <p className="text-base text-muted-foreground md:text-lg">
-            {step === "name" || step === "poem" ? "Pratiquez vos conjugaisons latines" : 
+            {step === "name" || step === "poem" ? "Conjugaisons, Déclinaisons & Prépositions" : 
              step === "path" ? "Choisissez votre exercice" : subtitle}
           </p>
         </div>

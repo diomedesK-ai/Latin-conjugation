@@ -131,6 +131,39 @@
     0 0 20px rgba(217, 70, 239, 0.22);
 }
 
+/* Rainbow glow button - GREY variant (for Déclinaison - grey fill) */
+.pill-button-rainbow-grey {
+  @apply rounded-full px-8 py-2.5 text-sm font-medium transition-all duration-300;
+  @apply text-gray-800;
+  @apply active:scale-[0.98];
+  @apply outline-none;
+  position: relative;
+  border: 2px solid transparent;
+  background: 
+    linear-gradient(#9ca3af, #9ca3af) padding-box,
+    linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.6) 0%,
+      rgba(34, 197, 94, 0.6) 25%,
+      rgba(239, 68, 68, 0.6) 50%,
+      rgba(217, 70, 239, 0.6) 75%,
+      rgba(139, 92, 246, 0.6) 100%
+    ) border-box;
+  box-shadow: 
+    0 0 12px rgba(59, 130, 246, 0.12),
+    0 0 12px rgba(34, 197, 94, 0.1),
+    0 0 12px rgba(239, 68, 68, 0.1),
+    0 0 12px rgba(217, 70, 239, 0.1);
+}
+
+.pill-button-rainbow-grey:hover {
+  transform: scale(1.02);
+  box-shadow: 
+    0 0 18px rgba(59, 130, 246, 0.18),
+    0 0 18px rgba(34, 197, 94, 0.15),
+    0 0 18px rgba(239, 68, 68, 0.15),
+    0 0 18px rgba(217, 70, 239, 0.15);
+}
+
 /* Disabled button - blends into background */
 .pill-button-disabled {
   @apply rounded-full px-8 py-2.5 text-sm font-medium;
@@ -391,21 +424,22 @@
 /* Apple Intelligence Multi-Color Gradient Border */
 .rainbow-glow-selected {
   position: relative;
-  border: 2px solid transparent;
+  border: 3px solid transparent !important;
+  border-radius: 1rem !important;
   background: 
     linear-gradient(white, white) padding-box,
     linear-gradient(135deg, 
-      rgba(59, 130, 246, 0.7) 0%,      /* Blue */
-      rgba(34, 197, 94, 0.7) 25%,      /* Green */
-      rgba(239, 68, 68, 0.7) 50%,      /* Red */
-      rgba(217, 70, 239, 0.7) 75%,     /* Fuchsia */
-      rgba(139, 92, 246, 0.7) 100%    /* Purple */
-    ) border-box;
+      rgba(59, 130, 246, 0.8) 0%,      /* Blue */
+      rgba(34, 197, 94, 0.8) 25%,      /* Green */
+      rgba(239, 68, 68, 0.8) 50%,      /* Red */
+      rgba(217, 70, 239, 0.8) 75%,     /* Fuchsia */
+      rgba(139, 92, 246, 0.8) 100%    /* Purple */
+    ) border-box !important;
   box-shadow: 
-    0 0 12px rgba(59, 130, 246, 0.15),
-    0 0 12px rgba(34, 197, 94, 0.12),
-    0 0 12px rgba(239, 68, 68, 0.12),
-    0 0 12px rgba(217, 70, 239, 0.12);
+    0 0 15px rgba(59, 130, 246, 0.18),
+    0 0 15px rgba(34, 197, 94, 0.15),
+    0 0 15px rgba(239, 68, 68, 0.15),
+    0 0 15px rgba(217, 70, 239, 0.15) !important;
 }
 
 /* Infectum stays white/light even in dark mode for visual distinction */
@@ -413,21 +447,43 @@
 /* Dark/Black background variant for Perfectum */
 .rainbow-glow-selected-dark {
   position: relative;
-  border: 2px solid transparent;
+  border: 3px solid transparent !important;
+  border-radius: 1rem !important;
   background: 
     linear-gradient(#000, #000) padding-box,
     linear-gradient(135deg, 
-      rgba(59, 130, 246, 0.7) 0%,
-      rgba(34, 197, 94, 0.7) 25%,
-      rgba(239, 68, 68, 0.7) 50%,
-      rgba(217, 70, 239, 0.7) 75%,
-      rgba(139, 92, 246, 0.7) 100%
-    ) border-box;
+      rgba(59, 130, 246, 0.8) 0%,
+      rgba(34, 197, 94, 0.8) 25%,
+      rgba(239, 68, 68, 0.8) 50%,
+      rgba(217, 70, 239, 0.8) 75%,
+      rgba(139, 92, 246, 0.8) 100%
+    ) border-box !important;
   box-shadow: 
-    0 0 12px rgba(59, 130, 246, 0.18),
-    0 0 12px rgba(34, 197, 94, 0.15),
-    0 0 12px rgba(239, 68, 68, 0.15),
-    0 0 12px rgba(217, 70, 239, 0.15);
+    0 0 15px rgba(59, 130, 246, 0.2),
+    0 0 15px rgba(34, 197, 94, 0.18),
+    0 0 15px rgba(239, 68, 68, 0.18),
+    0 0 15px rgba(217, 70, 239, 0.18) !important;
+}
+
+/* Grey background variant for Déclinaison */
+.rainbow-glow-selected-grey {
+  position: relative;
+  border: 3px solid transparent !important;
+  border-radius: 1rem !important;
+  background: 
+    linear-gradient(#a1a1aa, #a1a1aa) padding-box,
+    linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.8) 0%,
+      rgba(34, 197, 94, 0.8) 25%,
+      rgba(239, 68, 68, 0.8) 50%,
+      rgba(217, 70, 239, 0.8) 75%,
+      rgba(139, 92, 246, 0.8) 100%
+    ) border-box !important;
+  box-shadow: 
+    0 0 15px rgba(59, 130, 246, 0.18),
+    0 0 15px rgba(34, 197, 94, 0.15),
+    0 0 15px rgba(239, 68, 68, 0.15),
+    0 0 15px rgba(217, 70, 239, 0.15) !important;
 }
 
 .rainbow-glow-selected-subtle {

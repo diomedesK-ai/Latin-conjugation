@@ -178,17 +178,43 @@ export function VerbExercise({ studentName, verbCount, categories, tenseSystem, 
       if (incorrect.size > 0) {
         setIncorrectFields(incorrect)
         
-        // Generate helpful hint without giving the answer
-        const hints = [
-          `Attention aux terminaisons du ${currentTenseInfo?.label || tense}`,
-          "Vérifie le radical du verbe",
-          "Pense à la voyelle de liaison",
-          `Rappelle-toi les terminaisons : ${currentTenseInfo?.endings || ""}`,
-          "Vérifie la conjugaison du verbe",
-        ]
-        const randomHint = hints[Math.floor(Math.random() * hints.length)]
+        // Generate intelligent hint from LLM based on actual errors
+        const personLabels = ["1ère pers. sing.", "2ème pers. sing.", "3ème pers. sing.", "1ère pers. plur.", "2ème pers. plur.", "3ème pers. plur."]
+        const fieldKeys = ["singular1", "singular2", "singular3", "plural1", "plural2", "plural3"]
         
-        setFeedback(`Il y a ${incorrect.size} erreur${incorrect.size > 1 ? "s" : ""}. ${randomHint}.`)
+        const errorDetails = fieldKeys
+          .map((key, i) => {
+            if (incorrect.has(key)) {
+              return `${personLabels[i]}: "${userAnswers[i]}" (attendu: "${correctAnswers[i]}")`
+            }
+            return null
+          })
+          .filter(Boolean)
+          .join(", ")
+        
+        try {
+          const hintResponse = await fetch("/api/generate-hint", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              verb: currentVerb.infinitive,
+              tense: currentTenseInfo?.label || tense,
+              tenseSystem,
+              errors: errorDetails,
+              studentName,
+            }),
+          })
+          
+          if (hintResponse.ok) {
+            const hintData = await hintResponse.json()
+            setFeedback(`Il y a ${incorrect.size} erreur${incorrect.size > 1 ? "s" : ""}. ${hintData.hint}`)
+          } else {
+            setFeedback(`Il y a ${incorrect.size} erreur${incorrect.size > 1 ? "s" : ""}. Vérifie les terminaisons du ${currentTenseInfo?.label || tense}.`)
+          }
+        } catch {
+          setFeedback(`Il y a ${incorrect.size} erreur${incorrect.size > 1 ? "s" : ""}. Vérifie les terminaisons du ${currentTenseInfo?.label || tense}.`)
+        }
+        
         setIsValidating(false)
         return
       }

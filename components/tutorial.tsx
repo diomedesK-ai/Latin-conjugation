@@ -27,17 +27,29 @@ const steps: TutorialStep[] = [
     content: (
       <div className="grid grid-cols-3 gap-2 mt-4">
         <div className="rounded-xl p-3 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border border-gray-300 dark:border-gray-700 text-left">
-          <div className="text-2xl mb-1">🔄</div>
+          <div className="w-8 h-8 rounded-full border-2 border-gray-400 dark:border-gray-500 flex items-center justify-center mb-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500 dark:text-gray-400">
+              <path d="M12 3v18M3 12h18M7 7l10 10M17 7l-10 10" />
+            </svg>
+          </div>
           <div className="font-bold text-foreground text-xs">Conjugaison</div>
           <div className="text-[9px] text-muted-foreground mt-1">6 temps</div>
         </div>
         <div className="rounded-xl p-3 bg-white border border-gray-200 text-left">
-          <div className="text-2xl mb-1">📝</div>
+          <div className="w-8 h-8 rounded-full border-2 border-gray-400 flex items-center justify-center mb-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500">
+              <path d="M4 6h16M4 12h16M4 18h16M8 3v3M16 18v3" />
+            </svg>
+          </div>
           <div className="font-bold text-gray-800 text-xs">Déclinaison</div>
           <div className="text-[9px] text-gray-500 mt-1">6 cas</div>
         </div>
         <div className="rounded-xl p-3 bg-gray-900 border border-gray-700 text-left">
-          <div className="text-2xl mb-1">🔗</div>
+          <div className="w-8 h-8 rounded-full border-2 border-gray-500 flex items-center justify-center mb-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </div>
           <div className="font-bold text-white text-xs">Prépositions</div>
           <div className="text-[9px] text-gray-400 mt-1">Acc/Abl</div>
         </div>

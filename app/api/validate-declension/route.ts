@@ -17,14 +17,34 @@ const NUMBER_LABELS: Record<string, string> = {
 }
 
 export async function POST(request: Request) {
+  // Parse request body once, before try block
+  let requestData: {
+    noun: string
+    genitive: string
+    userAnswer: string
+    correctAnswer: string
+    studentName: string
+    declension: string
+    number: string
+  }
+  
   try {
-    const { noun, genitive, userAnswer, correctAnswer, studentName, declension, number } = await request.json()
+    requestData = await request.json()
+  } catch {
+    return Response.json({
+      isCorrect: false,
+      feedback: "Erreur de validation. Veuillez réessayer.",
+    })
+  }
 
-    // Simple comparison
-    const userForms = userAnswer.toLowerCase().split(",").map((s: string) => s.trim())
-    const correctForms = correctAnswer.toLowerCase().split(",").map((s: string) => s.trim())
-    const isCorrect = userForms.every((form: string, i: number) => form === correctForms[i])
+  const { noun, genitive, userAnswer, correctAnswer, studentName, declension, number } = requestData
 
+  // Simple comparison
+  const userForms = userAnswer.toLowerCase().split(",").map((s: string) => s.trim())
+  const correctForms = correctAnswer.toLowerCase().split(",").map((s: string) => s.trim())
+  const isCorrect = userForms.every((form: string, i: number) => form === correctForms[i])
+
+  try {
     if (isCorrect) {
       // Generate positive feedback
       const { text } = await generateText({
@@ -68,10 +88,7 @@ Génère un conseil court (2-3 lignes max) en français pour aider l'élève à 
   } catch (error) {
     console.error("Validation error:", error)
     
-    // Fallback validation
-    const { userAnswer, correctAnswer } = await request.json()
-    const isCorrect = userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim()
-    
+    // Fallback validation - use already parsed data
     return Response.json({
       isCorrect,
       feedback: isCorrect 

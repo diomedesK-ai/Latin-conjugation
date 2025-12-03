@@ -166,15 +166,40 @@ export function DeclensionExercise({
       if (incorrect.size > 0) {
         setIncorrectFields(incorrect)
         
-        const hints = [
-          `Attention aux terminaisons de la ${declension}ème déclinaison`,
-          "Vérifie le radical du nom",
-          `Rappelle-toi les terminaisons du ${number === "singular" ? "singulier" : "pluriel"}`,
-          "Pense au genre du nom",
-        ]
-        const randomHint = hints[Math.floor(Math.random() * hints.length)]
+        // Generate intelligent hint from LLM based on actual errors
+        const errorDetails = CASES_ORDER
+          .map((c, index) => {
+            if (incorrect.has(c)) {
+              return `${CASE_INFO[c].label}: "${answers[c]}" (attendu: "${currentNoun.forms[index]}")`
+            }
+            return null
+          })
+          .filter(Boolean)
+          .join(", ")
         
-        setFeedback(`Il y a ${incorrect.size} erreur${incorrect.size > 1 ? "s" : ""}. ${randomHint}.`)
+        try {
+          const hintResponse = await fetch("/api/generate-hint", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              verb: currentNoun.nominativeSingular,
+              tense: `${declension}ème déclinaison au ${number === "singular" ? "singulier" : "pluriel"}`,
+              tenseSystem: "declension",
+              errors: errorDetails,
+              studentName,
+            }),
+          })
+          
+          if (hintResponse.ok) {
+            const hintData = await hintResponse.json()
+            setFeedback(`Il y a ${incorrect.size} erreur${incorrect.size > 1 ? "s" : ""}. ${hintData.hint}`)
+          } else {
+            setFeedback(`Il y a ${incorrect.size} erreur${incorrect.size > 1 ? "s" : ""}. Vérifie les terminaisons de la ${declension}ème déclinaison.`)
+          }
+        } catch {
+          setFeedback(`Il y a ${incorrect.size} erreur${incorrect.size > 1 ? "s" : ""}. Vérifie les terminaisons de la ${declension}ème déclinaison.`)
+        }
+        
         setIsValidating(false)
         return
       }

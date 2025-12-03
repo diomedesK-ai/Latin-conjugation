@@ -15,28 +15,64 @@ const PATH_INFO = {
   conjugaison: {
     label: "Conjugaison",
     description: "Verbes latins",
-    icon: "🔄",
-    details: "Infectum & Perfectum • 6 temps",
+    details: "Infectum & Perfectum",
+    subdetails: "6 temps de l'indicatif",
     examples: ["amo, amas, amat...", "amavi, amavisti..."],
-    theme: "gradient" as const
   },
   declinaison: {
     label: "Déclinaison",
     description: "Noms & adjectifs",
-    icon: "📝",
-    details: "1ère, 2ème, 3ème • 6 cas",
+    details: "1ère, 2ème, 3ème",
+    subdetails: "6 cas • Singulier/Pluriel",
     examples: ["rosa, rosae, rosam...", "dominus, domini..."],
-    theme: "light" as const
   },
   preposition: {
     label: "Prépositions",
     description: "Régimes des cas",
-    icon: "🔗",
     details: "Accusatif & Ablatif",
+    subdetails: "Prépositions latines",
     examples: ["ad + acc", "ab + abl", "in + acc/abl"],
-    theme: "dark" as const
   }
 }
+
+// Professional minimal icons - circles with line icons, no fill
+const ConjugaisonIcon = ({ selected }: { selected: boolean }) => (
+  <div className={`w-16 h-16 rounded-full border-2 flex items-center justify-center transition-all ${
+    selected ? "border-black" : "border-gray-400 dark:border-gray-500"
+  }`}>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={selected ? "text-black" : "text-gray-500 dark:text-gray-400"}>
+      <path d="M12 3v18" />
+      <path d="M3 12h18" />
+      <path d="m7 7 10 10" />
+      <path d="m17 7-10 10" />
+    </svg>
+  </div>
+)
+
+const DeclinaisonIcon = ({ selected }: { selected: boolean }) => (
+  <div className={`w-16 h-16 rounded-full border-2 flex items-center justify-center transition-all ${
+    selected ? "border-gray-700" : "border-gray-400"
+  }`}>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={selected ? "text-gray-700" : "text-gray-500"}>
+      <path d="M4 6h16" />
+      <path d="M4 12h16" />
+      <path d="M4 18h16" />
+      <path d="M8 3v3" />
+      <path d="M16 18v3" />
+    </svg>
+  </div>
+)
+
+const PrepositionIcon = ({ selected }: { selected: boolean }) => (
+  <div className={`w-16 h-16 rounded-full border-2 flex items-center justify-center transition-all ${
+    selected ? "border-white" : "border-gray-500"
+  }`}>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={selected ? "text-white" : "text-gray-400"}>
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  </div>
+)
 
 export function LearningPathSelect({ studentName, onSubmit, onBack }: LearningPathSelectProps) {
   const [selectedPath, setSelectedPath] = useState<LearningPath | null>(null)
@@ -49,7 +85,7 @@ export function LearningPathSelect({ studentName, onSubmit, onBack }: LearningPa
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-8 w-full">
       <p className="text-lg text-foreground">
         Excellent, <span className="inline-flex items-center px-3 py-0.5 rounded-full bg-black text-white text-base font-medium dark:bg-white dark:text-black">{studentName}</span> !
       </p>
@@ -59,23 +95,22 @@ export function LearningPathSelect({ studentName, onSubmit, onBack }: LearningPa
           Choisissez votre exercice
         </label>
         
-        <div className="grid grid-cols-1 gap-4">
-          {/* Conjugaison - Gradient theme */}
+        {/* Side by side - 3 columns */}
+        <div className="grid grid-cols-3 gap-8">
+          {/* Conjugaison - WHITE when selected */}
           <button
             type="button"
             onClick={() => setSelectedPath("conjugaison")}
-            className={`rounded-2xl p-5 text-left transition-all duration-300 ${
+            className={`rounded-2xl p-8 text-left transition-all duration-300 min-h-[280px] ${
               selectedPath === "conjugaison"
                 ? "scale-[1.02] rainbow-glow-selected"
-                : "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 text-foreground border-2 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+                : "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 text-foreground border-2 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
             }`}
           >
-            <div className="flex items-start gap-4">
-              <div className={`text-3xl ${selectedPath === "conjugaison" ? "animate-pulse" : ""}`}>
-                {PATH_INFO.conjugaison.icon}
-              </div>
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-2">
+            <div className="flex flex-col items-center text-center gap-4 h-full">
+              <ConjugaisonIcon selected={selectedPath === "conjugaison"} />
+              <div className="space-y-2.5 flex-1">
+                <div className="flex items-center justify-center gap-2">
                   <div className={`indicator-dot ${selectedPath === "conjugaison" ? "rainbow-dot" : "bg-gray-300 dark:bg-gray-600 border border-gray-400 dark:border-gray-500"}`} />
                   <span className={`font-bold text-lg ${selectedPath === "conjugaison" ? "text-black" : ""}`}>
                     {PATH_INFO.conjugaison.label}
@@ -84,82 +119,84 @@ export function LearningPathSelect({ studentName, onSubmit, onBack }: LearningPa
                 <p className={`text-sm ${selectedPath === "conjugaison" ? "text-gray-700" : "text-muted-foreground"}`}>
                   {PATH_INFO.conjugaison.description}
                 </p>
-                <p className={`text-xs ${selectedPath === "conjugaison" ? "text-gray-500" : "text-muted-foreground/70"}`}>
+                <p className={`text-sm font-medium ${selectedPath === "conjugaison" ? "text-gray-600" : "text-muted-foreground/80"}`}>
                   {PATH_INFO.conjugaison.details}
                 </p>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {PATH_INFO.conjugaison.examples.map((ex, i) => (
-                    <span key={i} className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
-                      selectedPath === "conjugaison" 
-                        ? "bg-gray-100 text-gray-600" 
-                        : "bg-gray-200/50 dark:bg-gray-700/50 text-muted-foreground"
-                    }`}>
-                      {ex}
-                    </span>
-                  ))}
-                </div>
+                <p className={`text-xs ${selectedPath === "conjugaison" ? "text-gray-500" : "text-muted-foreground/60"}`}>
+                  {PATH_INFO.conjugaison.subdetails}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center mt-auto">
+                {PATH_INFO.conjugaison.examples.map((ex, i) => (
+                  <span key={i} className={`text-[10px] px-2.5 py-1 rounded-full font-mono ${
+                    selectedPath === "conjugaison" 
+                      ? "bg-gray-200 text-gray-700" 
+                      : "bg-gray-300/80 dark:bg-gray-600 text-gray-600 dark:text-gray-300"
+                  }`}>
+                    {ex}
+                  </span>
+                ))}
               </div>
             </div>
           </button>
 
-          {/* Déclinaison - Light/White theme */}
+          {/* Déclinaison - GREY when selected */}
           <button
             type="button"
             onClick={() => setSelectedPath("declinaison")}
-            className={`rounded-2xl p-5 text-left transition-all duration-300 ${
+            className={`rounded-2xl p-8 text-left transition-all duration-300 min-h-[280px] ${
               selectedPath === "declinaison"
-                ? "scale-[1.02] rainbow-glow-selected"
-                : "bg-[#c8c8c8] dark:bg-gray-200 text-gray-700 border-2 border-gray-300 hover:border-gray-400 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+                ? "scale-[1.02] rainbow-glow-selected-grey"
+                : "bg-[#c8c8c8] dark:bg-gray-300 text-gray-700 border-2 border-gray-300 dark:border-gray-400 hover:border-gray-400"
             }`}
           >
-            <div className="flex items-start gap-4">
-              <div className={`text-3xl ${selectedPath === "declinaison" ? "animate-pulse" : ""}`}>
-                {PATH_INFO.declinaison.icon}
-              </div>
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-2">
+            <div className="flex flex-col items-center text-center gap-4 h-full">
+              <DeclinaisonIcon selected={selectedPath === "declinaison"} />
+              <div className="space-y-2.5 flex-1">
+                <div className="flex items-center justify-center gap-2">
                   <div className={`indicator-dot ${selectedPath === "declinaison" ? "rainbow-dot" : "bg-gray-200 border border-gray-300"}`} />
-                  <span className={`font-bold text-lg ${selectedPath === "declinaison" ? "text-black" : "text-gray-700"}`}>
+                  <span className={`font-bold text-lg ${selectedPath === "declinaison" ? "text-gray-800" : "text-gray-700"}`}>
                     {PATH_INFO.declinaison.label}
                   </span>
                 </div>
                 <p className={`text-sm ${selectedPath === "declinaison" ? "text-gray-700" : "text-gray-500"}`}>
                   {PATH_INFO.declinaison.description}
                 </p>
-                <p className={`text-xs ${selectedPath === "declinaison" ? "text-gray-500" : "text-gray-400"}`}>
+                <p className={`text-sm font-medium ${selectedPath === "declinaison" ? "text-gray-600" : "text-gray-500"}`}>
                   {PATH_INFO.declinaison.details}
                 </p>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {PATH_INFO.declinaison.examples.map((ex, i) => (
-                    <span key={i} className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
-                      selectedPath === "declinaison" 
-                        ? "bg-gray-100 text-gray-600" 
-                        : "bg-white/50 text-gray-500"
-                    }`}>
-                      {ex}
-                    </span>
-                  ))}
-                </div>
+                <p className={`text-xs ${selectedPath === "declinaison" ? "text-gray-500" : "text-gray-400"}`}>
+                  {PATH_INFO.declinaison.subdetails}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center mt-auto">
+                {PATH_INFO.declinaison.examples.map((ex, i) => (
+                  <span key={i} className={`text-[10px] px-2.5 py-1 rounded-full font-mono ${
+                    selectedPath === "declinaison" 
+                      ? "bg-gray-300 text-gray-700" 
+                      : "bg-white/50 text-gray-500"
+                  }`}>
+                    {ex}
+                  </span>
+                ))}
               </div>
             </div>
           </button>
 
-          {/* Prépositions - Dark/Black theme */}
+          {/* Prépositions - BLACK when selected */}
           <button
             type="button"
             onClick={() => setSelectedPath("preposition")}
-            className={`rounded-2xl p-5 text-left transition-all duration-300 ${
+            className={`rounded-2xl p-8 text-left transition-all duration-300 min-h-[280px] ${
               selectedPath === "preposition"
                 ? "scale-[1.02] rainbow-glow-selected-dark"
-                : "bg-gray-900/90 dark:bg-gray-950 text-gray-300 border-2 border-gray-700 hover:border-gray-600 hover:shadow-[0_2px_10px_rgba(0,0,0,0.3)]"
+                : "bg-gray-900/90 dark:bg-gray-950 text-gray-300 border-2 border-gray-700 hover:border-gray-600"
             }`}
           >
-            <div className="flex items-start gap-4">
-              <div className={`text-3xl ${selectedPath === "preposition" ? "animate-pulse" : ""}`}>
-                {PATH_INFO.preposition.icon}
-              </div>
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-2">
+            <div className="flex flex-col items-center text-center gap-4 h-full">
+              <PrepositionIcon selected={selectedPath === "preposition"} />
+              <div className="space-y-2.5 flex-1">
+                <div className="flex items-center justify-center gap-2">
                   <div className={`indicator-dot ${selectedPath === "preposition" ? "rainbow-dot" : "bg-gray-700 border border-gray-500"}`} />
                   <span className="font-bold text-lg text-white">
                     {PATH_INFO.preposition.label}
@@ -168,16 +205,19 @@ export function LearningPathSelect({ studentName, onSubmit, onBack }: LearningPa
                 <p className="text-sm text-gray-400">
                   {PATH_INFO.preposition.description}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-sm font-medium text-gray-400">
                   {PATH_INFO.preposition.details}
                 </p>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {PATH_INFO.preposition.examples.map((ex, i) => (
-                    <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-gray-800 text-gray-300 font-mono">
-                      {ex}
-                    </span>
-                  ))}
-                </div>
+                <p className="text-xs text-gray-500">
+                  {PATH_INFO.preposition.subdetails}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center mt-auto">
+                {PATH_INFO.preposition.examples.map((ex, i) => (
+                  <span key={i} className="text-[10px] px-2.5 py-1 rounded-full bg-gray-800 text-gray-300 font-mono">
+                    {ex}
+                  </span>
+                ))}
               </div>
             </div>
           </button>
@@ -202,7 +242,9 @@ export function LearningPathSelect({ studentName, onSubmit, onBack }: LearningPa
               ? "pill-button-disabled" 
               : selectedPath === "preposition"
                 ? "pill-button-rainbow-dark"
-                : "pill-button-rainbow-light"
+                : selectedPath === "declinaison"
+                  ? "pill-button-rainbow-grey"
+                  : "pill-button-rainbow-light"
           }`}
         >
           Continuer
@@ -211,4 +253,3 @@ export function LearningPathSelect({ studentName, onSubmit, onBack }: LearningPa
     </form>
   )
 }
-

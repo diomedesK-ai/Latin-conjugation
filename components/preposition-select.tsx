@@ -32,32 +32,32 @@ export function PrepositionSelect({ studentName, onSubmit, onBack }: Preposition
         </label>
         
         <div className="grid grid-cols-1 gap-4">
-          {/* Accusative - Light/White theme */}
+          {/* Accusative - WHITE when selected */}
           <button
             type="button"
             onClick={() => setSelectedCase("accusative")}
             className={`rounded-2xl p-5 text-left transition-all duration-300 ${
               selectedCase === "accusative"
                 ? "scale-[1.02] rainbow-glow-selected"
-                : "bg-[#c8c8c8] text-gray-700 border-2 border-gray-300 hover:border-gray-400 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+                : "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 text-foreground border-2 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
             }`}
           >
             <div className="flex items-start gap-4">
               <div className={`text-2xl font-bold px-3 py-1 rounded-lg ${
                 selectedCase === "accusative" 
                   ? "bg-blue-100 text-blue-700" 
-                  : "bg-white/50 text-gray-600"
+                  : "bg-white/80 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
               }`}>
                 Acc
               </div>
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className={`indicator-dot ${selectedCase === "accusative" ? "rainbow-dot" : "bg-gray-200 border border-gray-300"}`} />
-                  <span className={`font-bold text-lg ${selectedCase === "accusative" ? "text-black" : "text-gray-700"}`}>
+                  <div className={`indicator-dot ${selectedCase === "accusative" ? "rainbow-dot" : "bg-gray-300 dark:bg-gray-600 border border-gray-400 dark:border-gray-500"}`} />
+                  <span className={`font-bold text-lg ${selectedCase === "accusative" ? "text-black" : ""}`}>
                     {PREPOSITION_INFO.accusative.label}
                   </span>
                 </div>
-                <p className={`text-sm ${selectedCase === "accusative" ? "text-gray-700" : "text-gray-500"}`}>
+                <p className={`text-sm ${selectedCase === "accusative" ? "text-gray-700" : "text-muted-foreground"}`}>
                   {PREPOSITION_INFO.accusative.description}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -65,7 +65,7 @@ export function PrepositionSelect({ studentName, onSubmit, onBack }: Preposition
                     <span key={prep} className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
                       selectedCase === "accusative" 
                         ? "bg-blue-100 text-blue-700" 
-                        : "bg-white/50 text-gray-500"
+                        : "bg-gray-300/80 dark:bg-gray-600 text-gray-600 dark:text-gray-300"
                     }`}>
                       {prep} + acc
                     </span>
@@ -75,37 +75,41 @@ export function PrepositionSelect({ studentName, onSubmit, onBack }: Preposition
             </div>
           </button>
 
-          {/* Ablative - Dark/Black theme */}
+          {/* Ablative - GREY when selected */}
           <button
             type="button"
             onClick={() => setSelectedCase("ablative")}
             className={`rounded-2xl p-5 text-left transition-all duration-300 ${
               selectedCase === "ablative"
-                ? "scale-[1.02] rainbow-glow-selected-dark"
-                : "bg-gray-900/90 text-gray-300 border-2 border-gray-700 hover:border-gray-600 hover:shadow-[0_2px_10px_rgba(0,0,0,0.3)]"
+                ? "scale-[1.02] rainbow-glow-selected-grey"
+                : "bg-[#c8c8c8] dark:bg-gray-300 text-gray-700 border-2 border-gray-300 dark:border-gray-400 hover:border-gray-400"
             }`}
           >
             <div className="flex items-start gap-4">
               <div className={`text-2xl font-bold px-3 py-1 rounded-lg ${
                 selectedCase === "ablative" 
-                  ? "bg-purple-900/50 text-purple-300" 
-                  : "bg-gray-800 text-gray-400"
+                  ? "bg-purple-200 text-purple-700" 
+                  : "bg-white/50 text-gray-600"
               }`}>
                 Abl
               </div>
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className={`indicator-dot ${selectedCase === "ablative" ? "rainbow-dot" : "bg-gray-700 border border-gray-500"}`} />
-                  <span className="font-bold text-lg text-white">
+                  <div className={`indicator-dot ${selectedCase === "ablative" ? "rainbow-dot" : "bg-gray-200 border border-gray-300"}`} />
+                  <span className={`font-bold text-lg ${selectedCase === "ablative" ? "text-gray-800" : "text-gray-700"}`}>
                     {PREPOSITION_INFO.ablative.label}
                   </span>
                 </div>
-                <p className="text-sm text-gray-400">
+                <p className={`text-sm ${selectedCase === "ablative" ? "text-gray-700" : "text-gray-500"}`}>
                   {PREPOSITION_INFO.ablative.description}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {["a/ab", "cum", "de", "e/ex", "sine"].map((prep) => (
-                    <span key={prep} className="text-[10px] px-2 py-0.5 rounded-full bg-gray-800 text-purple-300 font-mono">
+                    <span key={prep} className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
+                      selectedCase === "ablative" 
+                        ? "bg-purple-200 text-purple-700" 
+                        : "bg-white/50 text-gray-500"
+                    }`}>
                       {prep} + abl
                     </span>
                   ))}
@@ -114,46 +118,46 @@ export function PrepositionSelect({ studentName, onSubmit, onBack }: Preposition
             </div>
           </button>
 
-          {/* Both - Gradient theme */}
+          {/* Both - BLACK when selected */}
           <button
             type="button"
             onClick={() => setSelectedCase("both")}
             className={`rounded-2xl p-5 text-left transition-all duration-300 ${
               selectedCase === "both"
-                ? "scale-[1.02] rainbow-glow-selected"
-                : "bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 text-foreground border-2 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+                ? "scale-[1.02] rainbow-glow-selected-dark"
+                : "bg-gray-900/90 dark:bg-gray-950 text-gray-300 border-2 border-gray-700 hover:border-gray-600"
             }`}
           >
             <div className="flex items-start gap-4">
               <div className={`text-xl font-bold px-2 py-1 rounded-lg ${
                 selectedCase === "both" 
-                  ? "bg-gradient-to-r from-blue-100 to-purple-100 text-gray-700" 
-                  : "bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-700 text-gray-500 dark:text-gray-400"
+                  ? "bg-gradient-to-r from-blue-900/50 to-purple-900/50 text-gray-200" 
+                  : "bg-gray-800 text-gray-400"
               }`}>
                 Acc/Abl
               </div>
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className={`indicator-dot ${selectedCase === "both" ? "rainbow-dot" : "bg-gray-300 dark:bg-gray-600 border border-gray-400 dark:border-gray-500"}`} />
-                  <span className={`font-bold text-lg ${selectedCase === "both" ? "text-black" : ""}`}>
+                  <div className={`indicator-dot ${selectedCase === "both" ? "rainbow-dot" : "bg-gray-700 border border-gray-500"}`} />
+                  <span className="font-bold text-lg text-white">
                     {PREPOSITION_INFO.both.label}
                   </span>
                 </div>
-                <p className={`text-sm ${selectedCase === "both" ? "text-gray-700" : "text-muted-foreground"}`}>
+                <p className="text-sm text-gray-400">
                   {PREPOSITION_INFO.both.description}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {["in + acc/abl", "sub + acc/abl", "super + acc/abl"].map((prep) => (
                     <span key={prep} className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
                       selectedCase === "both" 
-                        ? "bg-gradient-to-r from-blue-100 to-purple-100 text-gray-700" 
-                        : "bg-gray-200/50 dark:bg-gray-700/50 text-muted-foreground"
+                        ? "bg-gradient-to-r from-blue-900/50 to-purple-900/50 text-gray-200" 
+                        : "bg-gray-800 text-gray-400"
                     }`}>
                       {prep}
                     </span>
                   ))}
                 </div>
-                <p className={`text-[10px] mt-1 ${selectedCase === "both" ? "text-gray-500" : "text-muted-foreground/70"}`}>
+                <p className={`text-[10px] mt-1 ${selectedCase === "both" ? "text-gray-400" : "text-gray-500"}`}>
                   Accusatif = mouvement • Ablatif = lieu
                 </p>
               </div>
@@ -178,9 +182,11 @@ export function PrepositionSelect({ studentName, onSubmit, onBack }: Preposition
           className={`disabled:cursor-not-allowed ${
             !selectedCase
               ? "pill-button-disabled" 
-              : selectedCase === "ablative"
+              : selectedCase === "both"
                 ? "pill-button-rainbow-dark"
-                : "pill-button-rainbow-light"
+                : selectedCase === "ablative"
+                  ? "pill-button-rainbow-grey"
+                  : "pill-button-rainbow-light"
           }`}
         >
           Continuer
@@ -189,4 +195,3 @@ export function PrepositionSelect({ studentName, onSubmit, onBack }: Preposition
     </form>
   )
 }
-
