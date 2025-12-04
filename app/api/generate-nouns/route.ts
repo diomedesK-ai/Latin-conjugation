@@ -14,7 +14,8 @@ const NounSchema = z.object({
       gender: z.enum(["masculine", "feminine", "neuter"]).describe("Genre du nom"),
       meaning: z.string().describe("Sens en français"),
       declension: z.enum(["1", "2", "3"]).describe("Numéro de la déclinaison"),
-      forms: z.array(z.string()).length(6).describe("Les 6 formes déclinées dans l'ordre: Nominatif, Vocatif, Accusatif, Génitif, Datif, Ablatif"),
+      singularForms: z.array(z.string()).length(6).describe("Les 6 formes au singulier dans l'ordre: Nominatif, Vocatif, Accusatif, Génitif, Datif, Ablatif"),
+      pluralForms: z.array(z.string()).length(6).describe("Les 6 formes au pluriel dans l'ordre: Nominatif, Vocatif, Accusatif, Génitif, Datif, Ablatif"),
     }),
   ),
 })
@@ -49,9 +50,8 @@ export async function POST(request: Request) {
     const { count, declension, number } = await request.json()
 
     const declInstruction = DECLENSION_INSTRUCTIONS[declension] || DECLENSION_INSTRUCTIONS["1"]
-    const numberLabel = number === "singular" ? "singulier" : "pluriel"
 
-    const prompt = `Tu es un expert en latin classique. Génère exactement ${count} noms latins de la ${declension}ère déclinaison pour un exercice de déclinaison au ${numberLabel}.
+    const prompt = `Tu es un expert en latin classique. Génère exactement ${count} noms latins de la ${declension}ère déclinaison pour un exercice de déclinaison.
 
 ${declInstruction}
 
@@ -64,12 +64,14 @@ EXIGENCES:
   * Le genre (masculine, feminine, neuter)
   * Le sens en français
   * Le numéro de déclinaison ("${declension}")
-  * Les 6 formes au ${numberLabel} dans cet ordre EXACT: Nominatif, Vocatif, Accusatif, Génitif, Datif, Ablatif
+  * Les 6 formes au SINGULIER dans cet ordre EXACT: Nominatif, Vocatif, Accusatif, Génitif, Datif, Ablatif
+  * Les 6 formes au PLURIEL dans cet ordre EXACT: Nominatif, Vocatif, Accusatif, Génitif, Datif, Ablatif
 
 TRÈS IMPORTANT: 
 - L'ordre des cas est: N (Nominatif), V (Vocatif), Ac (Accusatif), G (Génitif), D (Datif), Ab (Ablatif)
-- Les formes doivent être au ${numberLabel}, PAS mélangées avec le ${number === "singular" ? "pluriel" : "singulier"}
+- Fournis TOUTES les 12 formes (6 singulier + 6 pluriel) pour chaque nom
 - Pour l'ablatif singulier de la 1ère déclinaison, utilise -ā (avec macron) si possible, sinon -a
+- Pour la 2ème déclinaison neutre: les nominatif, vocatif et accusatif sont identiques au singulier (-um) et au pluriel (-a)
 
 Assure-toi que les déclinaisons sont EXACTES et conformes à la grammaire latine classique.`
 
@@ -85,4 +87,3 @@ Assure-toi que les déclinaisons sont EXACTES et conformes à la grammaire latin
     return Response.json({ error: "Failed to generate nouns" }, { status: 500 })
   }
 }
-

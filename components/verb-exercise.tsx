@@ -25,9 +25,10 @@ type VerbExerciseProps = {
   tense: LatinTense
   verificationMode: "per-step" | "at-end"
   onComplete: (results: ExerciseResult[], timeInSeconds: number) => void
+  onBack?: () => void
 }
 
-export function VerbExercise({ studentName, verbCount, categories, tenseSystem, tense, verificationMode, onComplete }: VerbExerciseProps) {
+export function VerbExercise({ studentName, verbCount, categories, tenseSystem, tense, verificationMode, onComplete, onBack }: VerbExerciseProps) {
   const [verbs, setVerbs] = useState<VerbData[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({
@@ -497,7 +498,16 @@ export function VerbExercise({ studentName, verbCount, categories, tenseSystem, 
           </div>
         )}
 
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-3">
+          {onBack && currentIndex === 0 && !showNext && (
+            <button 
+              type="button" 
+              onClick={onBack}
+              className="rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-300 border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+            >
+              Retour
+            </button>
+          )}
           <button type="submit" disabled={isValidating} className={`${tenseSystem === "infectum" ? "pill-button-rainbow-light" : "pill-button-rainbow-dark"} disabled:opacity-50`}>
             {isValidating
               ? verificationMode === "at-end"

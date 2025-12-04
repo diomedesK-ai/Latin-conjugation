@@ -136,15 +136,30 @@ export default function Home() {
     setStep("path")
   }
 
-  const handlePathSubmit = (path: LearningPath) => {
-    setLearningPath(path)
-    if (path === "conjugaison") {
-      setStep("tense")
-    } else if (path === "declinaison") {
-      setStep("declension-select")
-    } else {
-      setStep("translation-select")
-    }
+  // New handlers for inline sub-options in path select
+  const handleConjugaisonPathSubmit = (tenseSystem: TenseSystem) => {
+    setLearningPath("conjugaison")
+    setSelectedTenseSystem(tenseSystem)
+    setStep("tense") // Go to tense select to pick specific tense
+  }
+
+  const handleDeclinaisonPathSubmit = (declension: "1" | "2" | "3") => {
+    setLearningPath("declinaison")
+    setSelectedDeclension(declension as DeclensionNumber)
+    // Skip singular/plural selection, go directly to count
+    setStep("declension-count")
+  }
+
+  const handlePrepositionPathSubmit = () => {
+    setLearningPath("declinaison")
+    // Skip case selection, go directly to count
+    setStep("preposition-count")
+  }
+
+  const handleTraductionPathSubmit = (direction: TranslationDirection) => {
+    setLearningPath("traduction")
+    setSelectedTranslationDirection(direction)
+    setStep("translation-count") // Skip translation-select, go straight to count
   }
 
   // Conjugation handlers
@@ -165,12 +180,12 @@ export default function Home() {
     setStep("exercise")
   }
 
-  // Declension handlers
-  const handleDeclensionSelect = (declension: DeclensionNumber, number: DeclensionNumber2) => {
-    setSelectedDeclension(declension)
-    setSelectedNumber(number)
-    setStep("declension-count")
-  }
+  // Declension handlers - no longer needed since we skip singular/plural selection
+  // const handleDeclensionSelect = (declension: DeclensionNumber, number: DeclensionNumber2) => {
+  //   setSelectedDeclension(declension)
+  //   setSelectedNumber(number)
+  //   setStep("declension-count")
+  // }
 
   const handleDeclensionCountSubmit = (count: number, mode: "per-step" | "at-end") => {
     setItemCount(count)
@@ -231,9 +246,9 @@ export default function Home() {
       case "conjugaison":
         return { title: "Conjugaison Latine", subtitle: "Infectum & Perfectum" }
       case "declinaison":
-        return { title: "Déclinaisons Latines", subtitle: "Déclinaisons & Prépositions" }
+        return { title: "Déclinaison Latine", subtitle: "Noms & Adjectifs" }
       case "traduction":
-        return { title: "Traduction Latine", subtitle: "Vocabulaire FR ↔ LA" }
+        return { title: "Traduction Latine", subtitle: "Thème et Version" }
       default:
         return { title: "Latin", subtitle: "Pratiquez votre latin" }
     }
@@ -266,27 +281,31 @@ export default function Home() {
             {step === "name" || step === "poem" || step === "path" ? "Latin" : title}
           </h1>
           <p className="text-base text-muted-foreground md:text-lg">
-            {step === "name" || step === "poem" ? "Conjugaisons, Déclinaisons & Prépositions" : 
+            {step === "name" || step === "poem" ? "Conjugaison, Déclinaison & Traduction" : 
              step === "path" ? "Choisissez votre exercice" : subtitle}
           </p>
         </div>
 
         {step === "name" && <NameEntry onSubmit={handleNameSubmit} />}
 
-        {step === "poem" && <PoemDisplay studentName={studentName} onComplete={handlePoemComplete} />}
+        {step === "poem" && <PoemDisplay studentName={studentName} onComplete={handlePoemComplete} onBack={() => setStep("name")} />}
 
         {step === "path" && (
           <LearningPathSelect 
             studentName={studentName} 
-            onSubmit={handlePathSubmit}
-            onBack={() => setStep("name")}
+            onConjugaisonSubmit={handleConjugaisonPathSubmit}
+            onDeclinaisonSubmit={handleDeclinaisonPathSubmit}
+            onPrepositionSubmit={handlePrepositionPathSubmit}
+            onTraductionSubmit={handleTraductionPathSubmit}
+            onBack={() => setStep("poem")}
           />
         )}
 
         {/* Conjugation path */}
         {step === "tense" && (
           <TenseSelect 
-            studentName={studentName} 
+            studentName={studentName}
+            preSelectedSystem={selectedTenseSystem}
             onSubmit={handleTenseSubmit}
             onBack={() => setStep("path")}
           />
@@ -317,24 +336,17 @@ export default function Home() {
             tense={selectedTense}
             verificationMode={verificationMode}
             onComplete={handleExerciseComplete}
+            onBack={() => setStep("count")}
           />
         )}
 
-        {/* Declension path (includes prepositions) */}
-        {step === "declension-select" && (
-          <DeclensionSelect
-            studentName={studentName}
-            onSubmit={handleDeclensionSelect}
-            onPrepositionSubmit={handlePrepositionSelect}
-            onBack={() => setStep("path")}
-          />
-        )}
+        {/* Declension path - skip singular/plural selection, go directly to count */}
 
         {step === "declension-count" && (
           <VerbCountSelect 
             studentName={studentName} 
             onSubmit={handleDeclensionCountSubmit}
-            onBack={() => setStep("declension-select")}
+            onBack={() => setStep("path")}
             label="Combien de noms voulez-vous décliner ?"
           />
         )}
@@ -344,9 +356,9 @@ export default function Home() {
             studentName={studentName}
             nounCount={itemCount}
             declension={selectedDeclension}
-            number={selectedNumber}
             verificationMode={verificationMode}
             onComplete={handleExerciseComplete}
+            onBack={() => setStep("declension-count")}
           />
         )}
 
@@ -354,7 +366,7 @@ export default function Home() {
           <VerbCountSelect 
             studentName={studentName} 
             onSubmit={handlePrepositionCountSubmit}
-            onBack={() => setStep("declension-select")}
+            onBack={() => setStep("path")}
             label="Combien de questions voulez-vous ?"
           />
         )}
@@ -363,8 +375,8 @@ export default function Home() {
           <PrepositionExercise
             studentName={studentName}
             questionCount={itemCount}
-            caseType={selectedPrepositionCase}
             onComplete={handleExerciseComplete}
+            onBack={() => setStep("preposition-count")}
           />
         )}
 
@@ -393,6 +405,7 @@ export default function Home() {
             direction={selectedTranslationDirection}
             verificationMode={verificationMode}
             onComplete={handleExerciseComplete}
+            onBack={() => setStep("translation-count")}
           />
         )}
 

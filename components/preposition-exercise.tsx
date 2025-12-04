@@ -3,40 +3,41 @@
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import type { ExerciseResult } from "@/app/page"
-import { PREPOSITION_INFO, type PrepositionCase } from "@/lib/latin-prepositions"
 
 type PrepositionQuestion = {
+  sentence: string
   preposition: string
-  meaning: string
-  correctCase: "accusative" | "ablative"
-  exampleSentence: string
-  notes?: string
+  nounNominative: string
+  nounGenitive: string
+  correctForm: string
+  correctCase: string
+  translation: string
 }
 
 type PrepositionExerciseProps = {
   studentName: string
   questionCount: number
-  caseType: PrepositionCase
   onComplete: (results: ExerciseResult[], timeInSeconds: number) => void
+  onBack?: () => void
 }
 
 export function PrepositionExercise({ 
   studentName, 
   questionCount, 
-  caseType, 
-  onComplete 
+  onComplete,
+  onBack 
 }: PrepositionExerciseProps) {
   const [questions, setQuestions] = useState<PrepositionQuestion[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [selectedAnswer, setSelectedAnswer] = useState<"accusative" | "ablative" | null>(null)
+  const [answer, setAnswer] = useState("")
   const [results, setResults] = useState<ExerciseResult[]>([])
   const [isGenerating, setIsGenerating] = useState(true)
+  const [isValidating, setIsValidating] = useState(false)
   const [feedback, setFeedback] = useState<string | null>(null)
   const [showNext, setShowNext] = useState(false)
+  const [isCurrentCorrect, setIsCurrentCorrect] = useState(false)
+  const [hasHadHint, setHasHadHint] = useState(false)
   const [startTime] = useState<number>(Date.now())
-
-  const isAccusativeTheme = caseType === "accusative"
-  const caseInfo = PREPOSITION_INFO[caseType]
 
   useEffect(() => {
     async function generateQuestions() {
@@ -44,7 +45,7 @@ export function PrepositionExercise({
         const response = await fetch("/api/generate-prepositions", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ count: questionCount, caseType }),
+          body: JSON.stringify({ count: questionCount }),
         })
 
         if (response.ok) {
@@ -62,56 +63,119 @@ export function PrepositionExercise({
     }
 
     generateQuestions()
-  }, [questionCount, caseType])
+  }, [questionCount])
 
   const currentQuestion = questions[currentIndex]
 
-  const handleSelectAnswer = (answer: "accusative" | "ablative") => {
-    if (showNext) return
-    setSelectedAnswer(answer)
-  }
+  const validateAnswer = useCallback(async () => {
+    if (!currentQuestion || !answer.trim()) return null
 
-  const validateAnswer = useCallback(() => {
-    if (!currentQuestion || !selectedAnswer) return null
+    const userAnswerTrimmed = answer.trim().toLowerCase()
+    const correctAnswerLower = currentQuestion.correctForm.toLowerCase()
+    const isCorrect = userAnswerTrimmed === correctAnswerLower
 
-    const isCorrect = selectedAnswer === currentQuestion.correctCase
-    const feedbackText = isCorrect 
-      ? `Correct ! "${currentQuestion.preposition}" régit l'${currentQuestion.correctCase === "accusative" ? "accusatif" : "ablatif"}.`
-      : `Incorrect. "${currentQuestion.preposition}" régit l'${currentQuestion.correctCase === "accusative" ? "accusatif" : "ablatif"}, pas l'${selectedAnswer === "accusative" ? "accusatif" : "ablatif"}.`
+    // Generate feedback from LLM for more detailed explanation
+    let feedbackText = ""
+    try {
+      const response = await fetch("/api/validate-preposition", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          preposition: currentQuestion.preposition,
+          nounNominative: currentQuestion.nounNominative,
+          nounGenitive: currentQuestion.nounGenitive,
+          userAnswer: answer.trim(),
+          correctAnswer: currentQuestion.correctForm,
+          correctCase: currentQuestion.correctCase,
+          sentence: currentQuestion.sentence,
+          isCorrect,
+          studentName,
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        feedbackText = data.feedback
+      } else {
+        feedbackText = isCorrect 
+          ? `Excellent ! "${currentQuestion.preposition}" régit le ${currentQuestion.correctCase}.`
+          : `La bonne réponse est "${currentQuestion.correctForm}". "${currentQuestion.preposition}" régit le ${currentQuestion.correctCase}.`
+      }
+    } catch {
+      feedbackText = isCorrect 
+        ? `Excellent ! "${currentQuestion.preposition}" régit le ${currentQuestion.correctCase}.`
+        : `La bonne réponse est "${currentQuestion.correctForm}". "${currentQuestion.preposition}" régit le ${currentQuestion.correctCase}.`
+    }
 
     return {
       verb: currentQuestion.preposition,
-      principalParts: currentQuestion.meaning,
-      userAnswer: selectedAnswer === "accusative" ? "Accusatif" : "Ablatif",
-      correctAnswer: currentQuestion.correctCase === "accusative" ? "Accusatif" : "Ablatif",
+      principalParts: `${currentQuestion.nounNominative}, ${currentQuestion.nounGenitive}`,
+      userAnswer: answer.trim(),
+      correctAnswer: currentQuestion.correctForm,
       isCorrect,
       feedback: feedbackText,
-      category: caseInfo.label,
+      category: "Prépositions",
     }
-  }, [currentQuestion, selectedAnswer, caseInfo.label])
+  }, [currentQuestion, answer, studentName])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!showNext) {
       // Validate
-      const result = validateAnswer()
-      if (result) {
-        setFeedback(result.feedback)
-        setResults((prev) => [...prev, result])
-        setShowNext(true)
+      setIsValidating(true)
+      
+      const userAnswerTrimmed = answer.trim().toLowerCase()
+      const correctAnswerLower = currentQuestion.correctForm.toLowerCase()
+      const isCorrect = userAnswerTrimmed === correctAnswerLower
+
+      if (isCorrect) {
+        // Correct answer - proceed normally
+        const result = await validateAnswer()
+        if (result) {
+          setFeedback(result.feedback)
+          setIsCurrentCorrect(true)
+          setResults((prev) => [...prev, result])
+          setShowNext(true)
+        }
+      } else {
+        // Wrong answer
+        if (!hasHadHint) {
+          // First mistake - give a hint, allow retry
+          const hintFeedback = `Pas tout à fait ! Réfléchis au cas que "${currentQuestion.preposition}" régit. Rappel : les prépositions comme "ad", "contra", "per" régissent l'accusatif, tandis que "cum", "sine", "ab" régissent l'ablatif. Essaie encore !`
+          setFeedback(hintFeedback)
+          setHasHadHint(true)
+          setAnswer("") // Clear answer for retry
+        } else {
+          // Second mistake - show answer and mark as wrong
+          const result = await validateAnswer()
+          if (result) {
+            setFeedback(result.feedback)
+            setIsCurrentCorrect(false)
+            setResults((prev) => [...prev, result])
+            setShowNext(true)
+          }
+        }
       }
+      
+      setIsValidating(false)
     } else {
       // Next question
-      if (currentIndex + 1 >= questions.length) {
-        const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000)
-        onComplete(results, elapsedSeconds)
-      } else {
-        setCurrentIndex((prev) => prev + 1)
-        setSelectedAnswer(null)
-        setFeedback(null)
-        setShowNext(false)
-      }
+      handleNext()
+    }
+  }
+
+  const handleNext = () => {
+    if (currentIndex + 1 >= questions.length) {
+      const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000)
+      onComplete(results, elapsedSeconds)
+    } else {
+      setCurrentIndex((prev) => prev + 1)
+      setAnswer("")
+      setFeedback(null)
+      setShowNext(false)
+      setIsCurrentCorrect(false)
+      setHasHadHint(false)
     }
   }
 
@@ -120,7 +184,7 @@ export function PrepositionExercise({
       <div className="space-y-4 text-center">
         <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground" />
         <p className="text-muted-foreground">
-          Génération des questions sur les prépositions...
+          Génération des exercices de prépositions...
         </p>
       </div>
     )
@@ -137,8 +201,6 @@ export function PrepositionExercise({
     )
   }
 
-  const isCorrectAnswer = showNext && selectedAnswer === currentQuestion.correctCase
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between text-sm">
@@ -146,14 +208,8 @@ export function PrepositionExercise({
           Question {currentIndex + 1} sur {questions.length}
         </span>
         <div className="flex items-center gap-2">
-          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
-            isAccusativeTheme
-              ? "bg-white text-black border border-gray-300 shadow-sm"
-              : caseType === "ablative"
-                ? "bg-black text-white border border-gray-600 shadow-sm"
-                : "bg-gradient-to-r from-white to-black text-gray-600 border border-gray-400 shadow-sm"
-          }`}>
-            Prépositions • {caseInfo.label}
+          <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-700">
+            Prépositions
           </span>
           <span className="inline-flex items-center rounded-full bg-black text-white px-3 py-1 text-xs font-medium shadow-[0_2px_10px_rgba(0,0,0,0.3)] dark:bg-white dark:text-black dark:shadow-[0_2px_10px_rgba(255,255,255,0.3)]">
             {studentName}
@@ -161,153 +217,51 @@ export function PrepositionExercise({
         </div>
       </div>
 
-      <div className={`rounded-2xl border p-6 shadow-sm ${
-        isAccusativeTheme
-          ? "border-gray-200 bg-white"
-          : caseType === "ablative"
-            ? "border-gray-700 bg-gray-900"
-            : "border-gray-300 bg-gradient-to-br from-white to-gray-100 dark:from-gray-800 dark:to-gray-900 dark:border-gray-600"
-      }`}>
-        <p className={`mb-1 text-sm ${
-          isAccusativeTheme ? "text-gray-500" : caseType === "ablative" ? "text-gray-400" : "text-muted-foreground"
-        }`}>
-          Quel cas régit cette préposition ?
+      <div className="rounded-2xl border border-blue-200 bg-blue-50/50 dark:bg-blue-900/10 dark:border-blue-800 p-6 shadow-sm">
+        <p className="mb-1 text-sm text-blue-600 dark:text-blue-400">
+          Complétez la phrase en déclinant correctement le nom :
         </p>
-        <p className={`text-3xl font-bold ${
-          isAccusativeTheme ? "text-black" : caseType === "ablative" ? "text-white" : "text-foreground"
-        }`}>
-          {currentQuestion.preposition}
+        <p className="text-xl font-medium text-blue-900 dark:text-blue-100 mt-4">
+          {currentQuestion.sentence}
         </p>
-        <p className={`mt-2 text-sm ${
-          isAccusativeTheme ? "text-gray-500" : caseType === "ablative" ? "text-gray-400" : "text-muted-foreground"
-        }`}>
-          ({currentQuestion.meaning})
+        <p className="text-sm text-blue-600 dark:text-blue-400 mt-3">
+          ({currentQuestion.nounNominative}, {currentQuestion.nounGenitive})
         </p>
-        {currentQuestion.exampleSentence && (
-          <p className={`mt-3 text-xs italic ${
-            isAccusativeTheme ? "text-gray-400" : caseType === "ablative" ? "text-gray-500" : "text-muted-foreground/70"
-          }`}>
-            Ex: {currentQuestion.exampleSentence}
-          </p>
-        )}
+        <p className="text-xs text-blue-500 dark:text-blue-500 mt-2 italic">
+          « {currentQuestion.translation} »
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          {/* Accusative option */}
-          <button
-            type="button"
-            onClick={() => handleSelectAnswer("accusative")}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-foreground">
+            Votre réponse :
+          </label>
+          <input
+            type="text"
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            placeholder="Déclinez le nom..."
             disabled={showNext}
-            className={`rounded-2xl p-5 text-left transition-all duration-300 ${
-              selectedAnswer === "accusative"
-                ? showNext
-                  ? isCorrectAnswer
-                    ? "scale-[1.02] bg-green-100 border-2 border-green-500 dark:bg-green-900/30"
-                    : "scale-[1.02] bg-red-100 border-2 border-red-500 dark:bg-red-900/30"
-                  : "scale-[1.02] rainbow-glow-selected"
-                : showNext && currentQuestion.correctCase === "accusative"
-                  ? "bg-green-50 border-2 border-green-300 dark:bg-green-900/20"
-                  : "bg-[#c8c8c8] text-gray-700 border-2 border-gray-300 hover:border-gray-400 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)] disabled:hover:border-gray-300 disabled:hover:shadow-none"
-            }`}
-          >
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className={`indicator-dot ${
-                  selectedAnswer === "accusative" 
-                    ? showNext
-                      ? isCorrectAnswer ? "bg-green-500" : "bg-red-500"
-                      : "rainbow-dot"
-                    : "bg-gray-200 border border-gray-300"
-                }`} />
-                <span className={`font-bold text-lg ${
-                  selectedAnswer === "accusative" 
-                    ? showNext
-                      ? isCorrectAnswer ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"
-                      : "text-black"
-                    : "text-gray-700"
-                }`}>
-                  Accusatif
-                </span>
-              </div>
-              <p className={`text-xs ${
-                selectedAnswer === "accusative" ? "text-gray-600" : "text-gray-500"
-              }`}>
-                Mouvement, direction
-              </p>
-              <div className="flex flex-wrap gap-1 mt-2">
-                {["ad", "per", "trans"].map((p) => (
-                  <span key={p} className="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 font-mono">
-                    {p}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </button>
-
-          {/* Ablative option */}
-          <button
-            type="button"
-            onClick={() => handleSelectAnswer("ablative")}
-            disabled={showNext}
-            className={`rounded-2xl p-5 text-left transition-all duration-300 ${
-              selectedAnswer === "ablative"
-                ? showNext
-                  ? !isCorrectAnswer && selectedAnswer === "ablative"
-                    ? "scale-[1.02] bg-red-100 border-2 border-red-500 dark:bg-red-900/30"
-                    : isCorrectAnswer
-                      ? "scale-[1.02] bg-green-100 border-2 border-green-500 dark:bg-green-900/30"
-                      : "scale-[1.02] rainbow-glow-selected-dark"
-                  : "scale-[1.02] rainbow-glow-selected-dark"
-                : showNext && currentQuestion.correctCase === "ablative"
-                  ? "bg-green-50 border-2 border-green-300 dark:bg-green-900/20"
-                  : "bg-gray-900/90 text-gray-300 border-2 border-gray-700 hover:border-gray-600 hover:shadow-[0_2px_10px_rgba(0,0,0,0.3)] disabled:hover:border-gray-700 disabled:hover:shadow-none"
-            }`}
-          >
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className={`indicator-dot ${
-                  selectedAnswer === "ablative"
-                    ? showNext
-                      ? (selectedAnswer === currentQuestion.correctCase) ? "bg-green-500" : "bg-red-500"
-                      : "rainbow-dot"
-                    : "bg-gray-700 border border-gray-500"
-                }`} />
-                <span className={`font-bold text-lg ${
-                  selectedAnswer === "ablative"
-                    ? showNext
-                      ? (selectedAnswer === currentQuestion.correctCase) 
-                        ? "text-green-700 dark:text-green-300" 
-                        : "text-red-700 dark:text-red-300"
-                      : "text-white"
-                    : "text-white"
-                }`}>
-                  Ablatif
-                </span>
-              </div>
-              <p className="text-xs text-gray-400">
-                Origine, moyen, lieu
-              </p>
-              <div className="flex flex-wrap gap-1 mt-2">
-                {["ab", "cum", "de"].map((p) => (
-                  <span key={p} className="text-[9px] px-1.5 py-0.5 rounded-full bg-purple-900/50 text-purple-300 font-mono">
-                    {p}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </button>
+            className="pill-input w-full"
+            autoFocus
+          />
+          <p className="mt-2 text-xs text-muted-foreground">
+            💡 Indice : Quel cas la préposition "<span className="font-semibold text-blue-600 dark:text-blue-400">{currentQuestion.preposition}</span>" régit-elle ?
+          </p>
         </div>
 
         {feedback && (
           <div
             className={`rounded-2xl p-4 flex items-start gap-3 ${
-              isCorrectAnswer
+              showNext && isCurrentCorrect
                 ? "bg-green-50 text-green-900 dark:bg-green-950/30 dark:text-green-100"
-                : "bg-red-50 text-red-900 dark:bg-red-950/30 dark:text-red-100"
+                : showNext && !isCurrentCorrect
+                  ? "bg-red-50 text-red-900 dark:bg-red-950/30 dark:text-red-100"
+                  : "bg-yellow-50 text-yellow-900 dark:bg-yellow-950/30 dark:text-yellow-100"
             }`}
           >
-            {isCorrectAnswer && (
+            {isCurrentCorrect && (
               <div className="flex-shrink-0 mt-0.5">
                 <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
                   <svg
@@ -327,34 +281,37 @@ export function PrepositionExercise({
             )}
             <div className="text-sm leading-relaxed flex-1">
               {feedback}
-              {currentQuestion.notes && (
-                <p className="mt-2 text-xs opacity-75">
-                  💡 {currentQuestion.notes}
-                </p>
-              )}
             </div>
           </div>
         )}
 
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-3">
+          {onBack && currentIndex === 0 && !showNext && (
+            <button 
+              type="button" 
+              onClick={onBack}
+              className="rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-300 border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+            >
+              Retour
+            </button>
+          )}
           <button 
             type="submit" 
-            disabled={!selectedAnswer}
-            className={`${
-              caseType === "ablative" 
-                ? "pill-button-rainbow-dark" 
-                : "pill-button-rainbow-light"
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
+            disabled={isValidating || (!answer.trim() && !showNext)}
+            className="pill-button-rainbow-blue disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {showNext
-              ? currentIndex + 1 >= questions.length
-                ? "Voir les résultats"
-                : "Question suivante"
-              : "Vérifier"}
+            {isValidating
+              ? "Vérification..."
+              : showNext
+                ? currentIndex + 1 >= questions.length
+                  ? "Voir les résultats"
+                  : "Question suivante"
+                : hasHadHint
+                  ? "Vérifier à nouveau"
+                  : "Vérifier"}
           </button>
         </div>
       </form>
     </div>
   )
 }
-

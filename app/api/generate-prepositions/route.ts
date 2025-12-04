@@ -9,91 +9,73 @@ const openai = createOpenAI({
 const PrepositionSchema = z.object({
   questions: z.array(
     z.object({
-      preposition: z.string().describe("La préposition latine (ex: ad, cum, in)"),
-      meaning: z.string().describe("Sens en français"),
-      correctCase: z.enum(["accusative", "ablative"]).describe("Le cas régit par cette préposition"),
-      exampleSentence: z.string().describe("Un exemple d'utilisation en latin avec traduction"),
-      notes: z.string().optional().describe("Note grammaticale optionnelle"),
-    }),
+      sentence: z.string().describe("Phrase latine avec ___ pour la place du nom à décliner"),
+      preposition: z.string().describe("La préposition utilisée dans la phrase"),
+      nounNominative: z.string().describe("Le nom au nominatif singulier"),
+      nounGenitive: z.string().describe("Le nom au génitif singulier"),
+      correctForm: z.string().describe("La forme correctement déclinée du nom"),
+      correctCase: z.string().describe("Le cas grammatical requis par la préposition"),
+      translation: z.string().describe("Traduction française de la phrase"),
+    })
   ),
 })
 
-const CASE_INSTRUCTIONS: Record<string, string> = {
-  accusative: `PRÉPOSITIONS RÉGISSANT L'ACCUSATIF:
-- ad: vers, à, près de (ad urbem - vers la ville)
-- ante: avant, devant (ante templum - devant le temple)
-- apud: chez, auprès de (apud Caesarem - chez César)
-- circa: autour de, environ (circa forum - autour du forum)
-- contra: contre (contra hostes - contre les ennemis)
-- inter: entre, parmi (inter amicos - entre amis)
-- ob: à cause de (ob causam - à cause de)
-- per: à travers, par (per silvam - à travers la forêt)
-- post: après, derrière (post bellum - après la guerre)
-- praeter: devant, au-delà de, sauf (praeter castra - devant le camp)
-- propter: à cause de (propter metum - à cause de la peur)
-- trans: au-delà de (trans Alpes - au-delà des Alpes)
-- ultra: au-delà de (ultra fines - au-delà des frontières)`,
-
-  ablative: `PRÉPOSITIONS RÉGISSANT L'ABLATIF:
-- a/ab: de, par (ab urbe - de la ville) - ab devant voyelle
-- cum: avec (cum amicis - avec les amis)
-- de: de, au sujet de (de bello - au sujet de la guerre)
-- e/ex: hors de, de (ex urbe - hors de la ville) - ex devant voyelle
-- prae: devant, à cause de (prae metu - à cause de la peur)
-- pro: pour, devant (pro patria - pour la patrie)
-- sine: sans (sine aqua - sans eau)
-- coram: en présence de (coram populo - en présence du peuple)`,
-
-  both: `PRÉPOSITIONS À DOUBLE RÉGIME (Accusatif OU Ablatif):
-- in: + acc = mouvement vers (in urbem - vers la ville), + abl = lieu où l'on est (in urbe - dans la ville)
-- sub: + acc = mouvement vers le bas (sub montem - vers le pied de la montagne), + abl = lieu (sub terra - sous la terre)
-- super: sur, au-dessus de (peut régir les deux cas selon le sens)
-
-RÈGLE GÉNÉRALE:
-- Accusatif = mouvement, direction vers
-- Ablatif = lieu statique, position, moyen`
-}
-
 export async function POST(request: Request) {
   try {
-    const { count, caseType } = await request.json()
+    const { count } = await request.json()
 
-    let instruction = ""
-    let targetCases = ""
-    
-    if (caseType === "accusative") {
-      instruction = CASE_INSTRUCTIONS.accusative
-      targetCases = "UNIQUEMENT des prépositions régissant l'ACCUSATIF"
-    } else if (caseType === "ablative") {
-      instruction = CASE_INSTRUCTIONS.ablative
-      targetCases = "UNIQUEMENT des prépositions régissant l'ABLATIF"
-    } else {
-      instruction = `${CASE_INSTRUCTIONS.both}\n\n${CASE_INSTRUCTIONS.accusative}\n\n${CASE_INSTRUCTIONS.ablative}`
-      targetCases = "un MÉLANGE de prépositions (accusatif, ablatif, et à double régime). Pour les prépositions à double régime (in, sub), choisis aléatoirement si la bonne réponse est accusatif ou ablatif"
-    }
+    const prompt = `Tu es un expert en latin classique. Génère exactement ${count} exercices sur les prépositions latines.
 
-    const prompt = `Tu es un expert en latin classique. Génère exactement ${count} questions sur les prépositions latines.
+Pour chaque exercice, tu dois :
+1. Choisir une préposition latine (ad, ab, in, ex, cum, contra, per, sine, super, etc.)
+2. Créer une phrase latine qui MONTRE LA PRÉPOSITION et utilise ___ pour le nom à décliner
+3. Indiquer un nom entre parenthèses (nominatif, génitif) qui doit être décliné
+4. Fournir la forme correctement déclinée selon le cas requis par la préposition
+5. Indiquer quel cas grammatical est requis
+6. Donner la traduction française
 
-${instruction}
+EXEMPLES DE FORMAT ATTENDU (LA PRÉPOSITION DOIT ÊTRE VISIBLE):
 
-EXIGENCES:
-- Génère ${targetCases}
-- Varie les prépositions (ne répète pas la même)
-- Pour chaque question, fournis:
-  * La préposition latine
-  * Son sens en français
-  * Le cas qu'elle régit (accusative ou ablative)
-  * Un exemple d'utilisation en latin avec sa traduction française
-  * Une note grammaticale optionnelle (astuce pour se souvenir)
+1. Phrase: "Miles pugnat contra ___"
+   Préposition: "contra"
+   Nom: "hostis, hostis" (ennemi)
+   Forme correcte: "hostes"
+   Cas requis: "accusatif"
+   Traduction: "Le soldat combat contre les ennemis"
 
-${caseType === "both" ? `
-IMPORTANT pour le mode "mixte":
-- Pour "in" et "sub", indique SOIT accusatif SOIT ablatif selon l'exemple que tu donnes
-- Si l'exemple montre un mouvement: correctCase = "accusative"
-- Si l'exemple montre un lieu statique: correctCase = "ablative"
-` : ""}
+2. Phrase: "Regina venit cum ___"
+   Préposition: "cum"
+   Nom: "amica, amicae" (amie)
+   Forme correcte: "amica"
+   Cas requis: "ablatif"
+   Traduction: "La reine vient avec l'amie"
 
-L'objectif est de tester si l'étudiant sait quel cas utiliser avec chaque préposition.`
+3. Phrase: "Servus currit ad ___"
+   Préposition: "ad"
+   Nom: "domus, domus" (maison)
+   Forme correcte: "domum"
+   Cas requis: "accusatif"
+   Traduction: "L'esclave court vers la maison"
+
+4. Phrase: "Canis saltat super ___"
+   Préposition: "super"
+   Nom: "mensa, mensae" (table)
+   Forme correcte: "mensam"
+   Cas requis: "accusatif"
+   Traduction: "Le chien saute par-dessus la table"
+
+RÈGLES IMPORTANTES:
+- Varie les prépositions (ad, ab/a, in, ex/e, cum, contra, per, sine, sub, super, etc.)
+- Certaines prépositions régissent l'accusatif (ad, ante, apud, circa, contra, inter, per, post, super, etc.)
+- D'autres régissent l'ablatif (ab/a, cum, de, ex/e, sine, pro, etc.)
+- "in" et "sub" peuvent régir les deux cas selon le sens (mouvement = acc, lieu = abl)
+- Utilise des noms de différentes déclinaisons
+- Les phrases doivent être grammaticalement correctes et naturelles
+- TRÈS IMPORTANT: Dans "sentence", la PRÉPOSITION doit être VISIBLE dans la phrase, et ___ marque où le NOM DÉCLINÉ doit être placé
+- Format: "Verbe + PRÉPOSITION + ___" (ex: "currit ad ___", PAS "currit ___ domum")
+- Assure-toi que la forme déclinée soit correcte selon la déclinaison du nom
+
+Génère ${count} exercices variés et pédagogiques où la préposition est TOUJOURS visible dans la phrase.`
 
     const { object } = await generateObject({
       model: openai("gpt-4o"),
@@ -101,10 +83,9 @@ L'objectif est de tester si l'étudiant sait quel cas utiliser avec chaque prép
       prompt,
     })
 
-    return Response.json({ questions: object.questions, caseType })
+    return Response.json({ questions: object.questions })
   } catch (error) {
     console.error("Preposition generation error:", error)
-    return Response.json({ error: "Failed to generate prepositions" }, { status: 500 })
+    return Response.json({ error: "Failed to generate preposition questions" }, { status: 500 })
   }
 }
-

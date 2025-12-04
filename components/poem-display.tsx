@@ -5,9 +5,10 @@ import { useEffect, useState } from "react"
 type PoemDisplayProps = {
   studentName: string
   onComplete: () => void
+  onBack?: () => void
 }
 
-export function PoemDisplay({ studentName, onComplete }: PoemDisplayProps) {
+export function PoemDisplay({ studentName, onComplete, onBack }: PoemDisplayProps) {
   const [poemText, setPoemText] = useState("")
   const [displayedChars, setDisplayedChars] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
@@ -126,7 +127,15 @@ export function PoemDisplay({ studentName, onComplete }: PoemDisplayProps) {
       </div>
 
       {isComplete && (
-        <div className="mt-12 flex justify-center animate-fade-in">
+        <div className="mt-12 flex justify-center gap-3 animate-fade-in">
+          {onBack && (
+            <button 
+              onClick={onBack}
+              className="rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-300 border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+            >
+              Retour
+            </button>
+          )}
           <button onClick={onComplete} className="pill-glow">
             Commencer l'aventure
           </button>

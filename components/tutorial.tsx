@@ -15,7 +15,7 @@ type TutorialStep = {
 const steps: TutorialStep[] = [
   {
     title: "Bienvenue",
-    description: "Maîtrisez le latin avec la conjugaison, les déclinaisons et la traduction",
+    description: "Maîtrisez le latin avec conjugaison, déclinaison et traduction",
   },
   {
     title: "Entrez votre nom",
@@ -42,7 +42,7 @@ const steps: TutorialStep[] = [
             </svg>
           </div>
           <div className="font-bold text-gray-700 text-xs">Déclinaison</div>
-          <div className="text-[9px] text-gray-500 mt-1">+ Prépositions</div>
+          <div className="text-[9px] text-gray-500 mt-1">Noms & Adj.</div>
         </div>
         <div className="rounded-xl p-3 bg-gray-900 border border-gray-700 text-left">
           <div className="w-8 h-8 rounded-full border-2 border-gray-500 flex items-center justify-center mb-1">
@@ -51,7 +51,7 @@ const steps: TutorialStep[] = [
             </svg>
           </div>
           <div className="font-bold text-white text-xs">Traduction</div>
-          <div className="text-[9px] text-gray-400 mt-1">FR ↔ LA</div>
+          <div className="text-[9px] text-gray-400 mt-1">Thème/Version</div>
         </div>
       </div>
     )
@@ -111,7 +111,7 @@ const steps: TutorialStep[] = [
   },
   {
     title: "Prépositions",
-    description: "Dans Déclinaison : maîtrisez les cas régis par chaque préposition",
+    description: "Dans Traduction : maîtrisez les cas régis par chaque préposition",
     content: (
       <div className="grid grid-cols-2 gap-3 mt-4">
         <div className="rounded-xl p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-left">

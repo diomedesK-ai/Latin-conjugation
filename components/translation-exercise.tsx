@@ -19,6 +19,7 @@ type TranslationExerciseProps = {
   direction: TranslationDirection
   verificationMode: "per-step" | "at-end"
   onComplete: (results: ExerciseResult[], timeInSeconds: number) => void
+  onBack?: () => void
 }
 
 export function TranslationExercise({ 
@@ -26,7 +27,8 @@ export function TranslationExercise({
   wordCount, 
   direction, 
   verificationMode, 
-  onComplete 
+  onComplete,
+  onBack 
 }: TranslationExerciseProps) {
   const [words, setWords] = useState<WordData[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -156,9 +158,11 @@ export function TranslationExercise({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!showNext && verificationMode === "per-step") {
+    if (!showNext) {
+      // For ANY mode, store/validate the answer first
       handleSubmitCurrent()
     } else {
+      // Only move to next after validation (per-step mode only)
       handleNext()
     }
   }
@@ -273,7 +277,16 @@ export function TranslationExercise({
           </div>
         )}
 
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-3">
+          {onBack && currentIndex === 0 && !showNext && (
+            <button 
+              type="button" 
+              onClick={onBack}
+              className="rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-300 border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+            >
+              Retour
+            </button>
+          )}
           <button 
             type="submit" 
             disabled={isValidating || (!answer.trim() && !showNext)} 

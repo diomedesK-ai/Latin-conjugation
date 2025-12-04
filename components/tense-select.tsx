@@ -6,12 +6,13 @@ import { TENSE_INFO, type TenseSystem, type LatinTense } from "@/lib/latin-verbs
 
 type TenseSelectProps = {
   studentName: string
+  preSelectedSystem?: TenseSystem
   onSubmit: (tenseSystem: TenseSystem, tense: LatinTense) => void
   onBack?: () => void
 }
 
-export function TenseSelect({ studentName, onSubmit, onBack }: TenseSelectProps) {
-  const [selectedSystem, setSelectedSystem] = useState<TenseSystem | null>(null)
+export function TenseSelect({ studentName, preSelectedSystem, onSubmit, onBack }: TenseSelectProps) {
+  const [selectedSystem, setSelectedSystem] = useState<TenseSystem | null>(preSelectedSystem || null)
   const [selectedTense, setSelectedTense] = useState<LatinTense | null>(null)
 
   const handleSubmit = (e: React.FormEvent) => {

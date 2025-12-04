@@ -164,6 +164,53 @@
     0 0 18px rgba(217, 70, 239, 0.15);
 }
 
+/* Rainbow glow button - BLUE variant (for Prépositions - light blue fill) */
+.pill-button-rainbow-blue {
+  @apply rounded-full px-8 py-2.5 text-sm font-medium transition-all duration-300;
+  @apply text-blue-900;
+  @apply active:scale-[0.98];
+  @apply outline-none;
+  position: relative;
+  border: 2px solid transparent;
+  background: 
+    linear-gradient(#dbeafe, #dbeafe) padding-box,
+    linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.7) 0%,
+      rgba(34, 197, 94, 0.6) 25%,
+      rgba(239, 68, 68, 0.6) 50%,
+      rgba(217, 70, 239, 0.6) 75%,
+      rgba(139, 92, 246, 0.6) 100%
+    ) border-box;
+  box-shadow: 
+    0 0 15px rgba(59, 130, 246, 0.2),
+    0 0 12px rgba(34, 197, 94, 0.1),
+    0 0 12px rgba(239, 68, 68, 0.1),
+    0 0 12px rgba(217, 70, 239, 0.1);
+}
+
+.pill-button-rainbow-blue:hover {
+  transform: scale(1.02);
+  box-shadow: 
+    0 0 20px rgba(59, 130, 246, 0.25),
+    0 0 18px rgba(34, 197, 94, 0.15),
+    0 0 18px rgba(239, 68, 68, 0.15),
+    0 0 18px rgba(217, 70, 239, 0.15);
+}
+
+/* Dark mode variant for blue button */
+.dark .pill-button-rainbow-blue {
+  @apply text-blue-100;
+  background: 
+    linear-gradient(#1e3a8a, #1e3a8a) padding-box,
+    linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.7) 0%,
+      rgba(34, 197, 94, 0.6) 25%,
+      rgba(239, 68, 68, 0.6) 50%,
+      rgba(217, 70, 239, 0.6) 75%,
+      rgba(139, 92, 246, 0.6) 100%
+    ) border-box;
+}
+
 /* Disabled button - blends into background */
 .pill-button-disabled {
   @apply rounded-full px-8 py-2.5 text-sm font-medium;
@@ -484,6 +531,39 @@
     0 0 15px rgba(34, 197, 94, 0.15),
     0 0 15px rgba(239, 68, 68, 0.15),
     0 0 15px rgba(217, 70, 239, 0.15) !important;
+}
+
+.rainbow-glow-selected-blue {
+  position: relative;
+  border: 3px solid transparent !important;
+  border-radius: 1rem !important;
+  background: 
+    linear-gradient(#dbeafe, #dbeafe) padding-box,
+    linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.8) 0%,
+      rgba(34, 197, 94, 0.8) 25%,
+      rgba(239, 68, 68, 0.8) 50%,
+      rgba(217, 70, 239, 0.8) 75%,
+      rgba(139, 92, 246, 0.8) 100%
+    ) border-box !important;
+  box-shadow: 
+    0 0 15px rgba(59, 130, 246, 0.25),
+    0 0 15px rgba(34, 197, 94, 0.15),
+    0 0 15px rgba(239, 68, 68, 0.15),
+    0 0 15px rgba(217, 70, 239, 0.15) !important;
+}
+
+/* Dark mode variant for blue */
+.dark .rainbow-glow-selected-blue {
+  background: 
+    linear-gradient(#1e3a8a, #1e3a8a) padding-box,
+    linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.8) 0%,
+      rgba(34, 197, 94, 0.8) 25%,
+      rgba(239, 68, 68, 0.8) 50%,
+      rgba(217, 70, 239, 0.8) 75%,
+      rgba(139, 92, 246, 0.8) 100%
+    ) border-box !important;
 }
 
 .rainbow-glow-selected-subtle {

@@ -8,7 +8,6 @@ import {
   CASES_ORDER, 
   DECLENSION_INFO, 
   type DeclensionNumber, 
-  type DeclensionNumber2,
   type DeclensionCase 
 } from "@/lib/latin-declensions"
 
@@ -18,29 +17,38 @@ type NounData = {
   gender: string
   meaning: string
   declension: DeclensionNumber
-  forms: string[] // 6 forms in order: N, V, Ac, G, D, Ab
+  singularForms: string[] // 6 forms: N, V, Ac, G, D, Ab
+  pluralForms: string[]   // 6 forms: N, V, Ac, G, D, Ab
 }
 
 type DeclensionExerciseProps = {
   studentName: string
   nounCount: number
   declension: DeclensionNumber
-  number: DeclensionNumber2
   verificationMode: "per-step" | "at-end"
   onComplete: (results: ExerciseResult[], timeInSeconds: number) => void
+  onBack?: () => void
 }
 
 export function DeclensionExercise({ 
   studentName, 
   nounCount, 
   declension, 
-  number, 
   verificationMode, 
-  onComplete 
+  onComplete,
+  onBack 
 }: DeclensionExerciseProps) {
   const [nouns, setNouns] = useState<NounData[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [answers, setAnswers] = useState({
+  const [answersSingular, setAnswersSingular] = useState({
+    nominative: "",
+    vocative: "",
+    accusative: "",
+    genitive: "",
+    dative: "",
+    ablative: "",
+  })
+  const [answersPlural, setAnswersPlural] = useState({
     nominative: "",
     vocative: "",
     accusative: "",
@@ -51,7 +59,8 @@ export function DeclensionExercise({
   const [allAnswers, setAllAnswers] = useState<
     Array<{
       noun: NounData
-      answer: typeof answers
+      singular: typeof answersSingular
+      plural: typeof answersPlural
     }>
   >([])
   const [results, setResults] = useState<ExerciseResult[]>([])
@@ -62,7 +71,6 @@ export function DeclensionExercise({
   const [startTime] = useState<number>(Date.now())
   const [incorrectFields, setIncorrectFields] = useState<Set<string>>(new Set())
 
-  const isSingular = number === "singular"
   const declInfo = DECLENSION_INFO[declension]
 
   useEffect(() => {
@@ -71,7 +79,7 @@ export function DeclensionExercise({
         const response = await fetch("/api/generate-nouns", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ count: nounCount, declension, number }),
+          body: JSON.stringify({ count: nounCount, declension, number: "both" }),
         })
 
         if (response.ok) {
@@ -89,14 +97,19 @@ export function DeclensionExercise({
     }
 
     generateNouns()
-  }, [nounCount, declension, number])
+  }, [nounCount, declension])
 
   const currentNoun = nouns[currentIndex]
 
   const validateAnswer = useCallback(
-    async (nounToValidate: NounData, answerToValidate: typeof answers) => {
-      const userAnswer = CASES_ORDER.map(c => answerToValidate[c]).join(", ")
-      const correctAnswer = nounToValidate.forms.join(", ")
+    async (nounToValidate: NounData, singularAnswer: typeof answersSingular, pluralAnswer: typeof answersPlural) => {
+      const userAnswerSingular = CASES_ORDER.map(c => singularAnswer[c]).join(", ")
+      const userAnswerPlural = CASES_ORDER.map(c => pluralAnswer[c]).join(", ")
+      const userAnswer = userAnswerSingular + " | " + userAnswerPlural
+      
+      const correctAnswerSingular = nounToValidate.singularForms.join(", ")
+      const correctAnswerPlural = nounToValidate.pluralForms.join(", ")
+      const correctAnswer = correctAnswerSingular + " | " + correctAnswerPlural
 
       try {
         const response = await fetch("/api/validate-declension", {
@@ -109,7 +122,7 @@ export function DeclensionExercise({
             correctAnswer,
             studentName,
             declension,
-            number,
+            number: "both",
           }),
         })
 
@@ -122,12 +135,16 @@ export function DeclensionExercise({
           correctAnswer,
           isCorrect: data.isCorrect,
           feedback: data.feedback,
-          category: `${declension}ème déclinaison`,
+          category: `${declension}ère déclinaison`,
         }
       } catch {
-        const isCorrect = CASES_ORDER.every((c, i) => 
-          answerToValidate[c].toLowerCase().trim() === nounToValidate.forms[i]?.toLowerCase()
+        const isCorrectSingular = CASES_ORDER.every((c, i) => 
+          singularAnswer[c].toLowerCase().trim() === nounToValidate.singularForms[i]?.toLowerCase()
         )
+        const isCorrectPlural = CASES_ORDER.every((c, i) => 
+          pluralAnswer[c].toLowerCase().trim() === nounToValidate.pluralForms[i]?.toLowerCase()
+        )
+        const isCorrect = isCorrectSingular && isCorrectPlural
 
         const fallbackFeedback = isCorrect 
           ? "Correct ! Bien joué." 
@@ -140,11 +157,11 @@ export function DeclensionExercise({
           correctAnswer,
           isCorrect,
           feedback: fallbackFeedback,
-          category: `${declension}ème déclinaison`,
+          category: `${declension}ère déclinaison`,
         }
       }
     },
-    [studentName, declension, number],
+    [studentName, declension],
   )
 
   const handleSubmitCurrent = async () => {
@@ -155,11 +172,14 @@ export function DeclensionExercise({
       setFeedback(null)
       setIncorrectFields(new Set())
 
-      // Check each field individually
+      // Check each field individually (both singular and plural)
       const incorrect = new Set<string>()
       CASES_ORDER.forEach((c, index) => {
-        if (answers[c].toLowerCase().trim() !== currentNoun.forms[index]?.toLowerCase()) {
-          incorrect.add(c)
+        if (answersSingular[c].toLowerCase().trim() !== currentNoun.singularForms[index]?.toLowerCase()) {
+          incorrect.add(`singular-${c}`)
+        }
+        if (answersPlural[c].toLowerCase().trim() !== currentNoun.pluralForms[index]?.toLowerCase()) {
+          incorrect.add(`plural-${c}`)
         }
       })
 
@@ -169,10 +189,14 @@ export function DeclensionExercise({
         // Generate intelligent hint from LLM based on actual errors
         const errorDetails = CASES_ORDER
           .map((c, index) => {
-            if (incorrect.has(c)) {
-              return `${CASE_INFO[c].label}: "${answers[c]}" (attendu: "${currentNoun.forms[index]}")`
+            const errors = []
+            if (incorrect.has(`singular-${c}`)) {
+              errors.push(`Singulier ${CASE_INFO[c].label}: "${answersSingular[c]}" (attendu: "${currentNoun.singularForms[index]}")`)
             }
-            return null
+            if (incorrect.has(`plural-${c}`)) {
+              errors.push(`Pluriel ${CASE_INFO[c].label}: "${answersPlural[c]}" (attendu: "${currentNoun.pluralForms[index]}")`)
+            }
+            return errors.length > 0 ? errors.join("; ") : null
           })
           .filter(Boolean)
           .join(", ")
@@ -183,7 +207,7 @@ export function DeclensionExercise({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               verb: currentNoun.nominativeSingular,
-              tense: `${declension}ème déclinaison au ${number === "singular" ? "singulier" : "pluriel"}`,
+              tense: `${declension}ème déclinaison`,
               tenseSystem: "declension",
               errors: errorDetails,
               studentName,
@@ -205,14 +229,18 @@ export function DeclensionExercise({
       }
 
       // All correct
-      const result = await validateAnswer(currentNoun, answers)
+      const result = await validateAnswer(currentNoun, answersSingular, answersPlural)
       setFeedback(result.feedback)
       setShowNext(true)
       setResults((prev) => [...prev, result])
       setIsValidating(false)
     } else {
       // Store current answer and pass to handleNext to avoid stale state issue
-      const updatedAnswers = [...allAnswers, { noun: currentNoun, answer: { ...answers } }]
+      const updatedAnswers = [...allAnswers, { 
+        noun: currentNoun, 
+        singular: { ...answersSingular },
+        plural: { ...answersPlural }
+      }]
       setAllAnswers(updatedAnswers)
       handleNext(updatedAnswers)
     }
@@ -228,7 +256,15 @@ export function DeclensionExercise({
       }
     } else {
       setCurrentIndex((prev) => prev + 1)
-      setAnswers({
+      setAnswersSingular({
+        nominative: "",
+        vocative: "",
+        accusative: "",
+        genitive: "",
+        dative: "",
+        ablative: "",
+      })
+      setAnswersPlural({
         nominative: "",
         vocative: "",
         accusative: "",
@@ -247,8 +283,8 @@ export function DeclensionExercise({
 
     const validationResults: ExerciseResult[] = []
 
-    for (const { noun, answer } of answersToValidate) {
-      const result = await validateAnswer(noun, answer)
+    for (const { noun, singular, plural } of answersToValidate) {
+      const result = await validateAnswer(noun, singular, plural)
       validationResults.push(result)
     }
 
@@ -259,9 +295,11 @@ export function DeclensionExercise({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!showNext && verificationMode === "per-step") {
+    if (!showNext) {
+      // For ANY mode, store/validate the answer first
       handleSubmitCurrent()
     } else {
+      // Only move to next after validation (per-step mode only)
       handleNext()
     }
   }
@@ -295,12 +333,8 @@ export function DeclensionExercise({
           Nom {currentIndex + 1} sur {nouns.length}
         </span>
         <div className="flex items-center gap-2">
-          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
-            isSingular
-              ? "bg-white text-black border border-gray-300 shadow-sm"
-              : "bg-black text-white border border-gray-600 shadow-sm"
-          }`}>
-            {declension}ère décl. • {isSingular ? "Singulier" : "Pluriel"}
+          <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-gray-100 text-gray-800 border border-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
+            {declension}ère décl. • Singulier & Pluriel
           </span>
           <span className="inline-flex items-center rounded-full bg-black text-white px-3 py-1 text-xs font-medium shadow-[0_2px_10px_rgba(0,0,0,0.3)] dark:bg-white dark:text-black dark:shadow-[0_2px_10px_rgba(255,255,255,0.3)]">
             {studentName}
@@ -308,55 +342,96 @@ export function DeclensionExercise({
         </div>
       </div>
 
-      <div className={`rounded-2xl border p-6 shadow-sm ${
-        isSingular
-          ? "border-gray-200 bg-white"
-          : "border-gray-700 bg-gray-900"
-      }`}>
-        <p className={`mb-1 text-sm ${isSingular ? "text-gray-500" : "text-gray-400"}`}>
-          Déclinez au {isSingular ? "singulier" : "pluriel"} :
+      <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-white via-gray-50 to-gray-100 p-6 shadow-sm dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 dark:border-gray-700">
+        <p className="mb-1 text-sm text-gray-500 dark:text-gray-400">
+          Déclinez au singulier et au pluriel :
         </p>
-        <p className={`text-xl font-medium ${isSingular ? "text-black" : "text-white"}`}>
+        <p className="text-xl font-medium text-black dark:text-white">
           {currentNoun.nominativeSingular}, {currentNoun.genitiveSingular}
         </p>
-        <p className={`mt-1 text-sm ${isSingular ? "text-gray-500" : "text-gray-400"}`}>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           ({currentNoun.meaning}) - {currentNoun.gender === "masculine" ? "m." : currentNoun.gender === "feminine" ? "f." : "n."}
         </p>
-        <p className={`mt-2 text-xs font-mono ${isSingular ? "text-gray-400" : "text-gray-500"}`}>
+        <p className="mt-2 text-xs font-mono text-gray-400 dark:text-gray-500">
           {declInfo.theme}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          {CASES_ORDER.map((caseKey, index) => {
-            const caseInfo = CASE_INFO[caseKey]
-            const isFirstColumn = index < 3
-            
-            return (
-              <div key={caseKey} className={isFirstColumn ? "" : ""}>
-                <label className="mb-1 flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="font-bold">{caseInfo.abbrev}</span>
-                  <span>{caseInfo.label}</span>
-                </label>
-                <input
-                  value={answers[caseKey]}
-                  onChange={(e) => {
-                    setAnswers((prev) => ({ ...prev, [caseKey]: e.target.value }))
-                    if (incorrectFields.has(caseKey)) {
-                      const newIncorrect = new Set(incorrectFields)
-                      newIncorrect.delete(caseKey)
-                      setIncorrectFields(newIncorrect)
-                    }
-                  }}
-                  placeholder={caseInfo.question}
-                  disabled={showNext && verificationMode === "per-step"}
-                  className={`pill-input w-full ${incorrectFields.has(caseKey) ? "input-error" : ""}`}
-                  autoFocus={index === 0}
-                />
-              </div>
-            )
-          })}
+        {/* Table with 2 columns: Singular | Plural */}
+        <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-200 dark:border-gray-700">
+                <th className="bg-gray-50 dark:bg-gray-800 py-3 px-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400">
+                  Cas
+                </th>
+                <th className="bg-white dark:bg-gray-800/50 py-3 px-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">
+                  Singulier
+                </th>
+                <th className="bg-gray-900 dark:bg-gray-950 py-3 px-4 text-left text-xs font-semibold text-gray-100">
+                  Pluriel
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {CASES_ORDER.map((caseKey, index) => {
+                const caseInfo = CASE_INFO[caseKey]
+                
+                return (
+                  <tr key={caseKey} className={`border-b border-gray-100 dark:border-gray-800 ${index % 2 === 0 ? 'bg-gray-50/30 dark:bg-gray-900/30' : 'bg-white dark:bg-gray-900/50'}`}>
+                    <td className="py-2 px-4">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-xs text-gray-700 dark:text-gray-300">{caseInfo.abbrev}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">{caseInfo.label}</span>
+                      </div>
+                    </td>
+                    <td className="py-2 px-4">
+                      <input
+                        value={answersSingular[caseKey]}
+                        onChange={(e) => {
+                          setAnswersSingular((prev) => ({ ...prev, [caseKey]: e.target.value }))
+                          if (incorrectFields.has(`singular-${caseKey}`)) {
+                            const newIncorrect = new Set(incorrectFields)
+                            newIncorrect.delete(`singular-${caseKey}`)
+                            setIncorrectFields(newIncorrect)
+                          }
+                        }}
+                        placeholder="..."
+                        disabled={showNext && verificationMode === "per-step"}
+                        className={`w-full px-3 py-1.5 text-sm rounded-lg border bg-white dark:bg-gray-800 transition-all ${
+                          incorrectFields.has(`singular-${caseKey}`) 
+                            ? "border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-950/30" 
+                            : "border-gray-200 dark:border-gray-700 focus:border-gray-400 dark:focus:border-gray-500"
+                        }`}
+                        autoFocus={index === 0}
+                      />
+                    </td>
+                    <td className="py-2 px-4 bg-gray-900/5 dark:bg-gray-950/50">
+                      <input
+                        value={answersPlural[caseKey]}
+                        onChange={(e) => {
+                          setAnswersPlural((prev) => ({ ...prev, [caseKey]: e.target.value }))
+                          if (incorrectFields.has(`plural-${caseKey}`)) {
+                            const newIncorrect = new Set(incorrectFields)
+                            newIncorrect.delete(`plural-${caseKey}`)
+                            setIncorrectFields(newIncorrect)
+                          }
+                        }}
+                        placeholder="..."
+                        disabled={showNext && verificationMode === "per-step"}
+                        className={`w-full px-3 py-1.5 text-sm rounded-lg border bg-gray-50 dark:bg-gray-900 transition-all ${
+                          incorrectFields.has(`plural-${caseKey}`) 
+                            ? "border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-950/30" 
+                            : "border-gray-200 dark:border-gray-700 focus:border-gray-400 dark:focus:border-gray-500"
+                        }`}
+                      />
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
 
         {feedback && verificationMode === "per-step" && (
@@ -391,11 +466,20 @@ export function DeclensionExercise({
           </div>
         )}
 
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-3">
+          {onBack && currentIndex === 0 && !showNext && (
+            <button 
+              type="button" 
+              onClick={onBack}
+              className="rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-300 border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+            >
+              Retour
+            </button>
+          )}
           <button 
             type="submit" 
             disabled={isValidating} 
-            className={`${isSingular ? "pill-button-rainbow-light" : "pill-button-rainbow-dark"} disabled:opacity-50`}
+            className="pill-button-rainbow-grey disabled:opacity-50"
           >
             {isValidating
               ? verificationMode === "at-end"
@@ -416,4 +500,3 @@ export function DeclensionExercise({
     </div>
   )
 }
-
